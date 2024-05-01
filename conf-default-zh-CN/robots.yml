@@ -1,0 +1,13 @@
+# BCSPanel robots
+
+# 如果启用，会添加 X-Robots-Tag 响应头以阻止搜索引擎收录。
+# 部分网页内置的 robots meta 标签不受该选项控制。
+# 类型: bool
+# 默认: true
+enable_x_robots_tag: true
+
+# 如果启用，会添加 robots.txt 以阻止搜索引擎访问所有内容。
+# ⚠ 如果其他网站上有链接指向被 robots.txt 文件屏蔽的网页，则此网页仍可能会被编入索引。⚠
+# 类型: bool
+# 默认: true
+enable_robots_txt: true

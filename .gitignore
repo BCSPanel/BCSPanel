@@ -1,0 +1,12 @@
+/src/web/
+/src/web-login/
+/src/web-login-simple/
+/BCSPanel.exe
+/BCSPanel
+/main.exe
+/main
+/log/
+/conf/cert/
+/.vs/
+/cache/
+/data/
