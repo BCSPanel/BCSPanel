@@ -1,11 +1,11 @@
-[submodule "web"]
+[submodule "src/web"]
 path = src/web
 url = https://github.com/bddjr/BCSPanel-web
 
-[submodule "web-login"]
+[submodule "src/web-login"]
 path = src/web-login
 url = https://github.com/bddjr/BCSPanel-web-login
 
-[submodule "web-login-simple"]
+[submodule "src/web-login-simple"]
 path = src/web-login-simple
 url = https://github.com/bddjr/BCSPanel-web-login-simple
