@@ -60,8 +60,3 @@ x_forwarder_auth: ""
 # 类型: bool
 # 默认: false
 enable_h2c: false
-
-# 启用极简版登录页面
-# 类型: bool
-# 默认: false
-enable_simple_login: false

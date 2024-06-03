@@ -2,7 +2,6 @@ package httprouter
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/bddjr/BCSPanel/src/server/conf"
@@ -29,7 +28,6 @@ func Init() {
 func UpdateRouter() {
 	// 设置配置文件
 	conf.Http.Old_PathPrefix = conf.Http.New_PathPrefix
-	conf.Http.Old_EnableSimpleLogin = conf.Http.New_EnableSimpleLogin
 
 	// 日志
 	mylog.INFOln("httprouter UpdateRouter")
@@ -60,27 +58,18 @@ func UpdateRouter() {
 	Router.HEAD("/robots.txt", RobotsTxtHandler)
 
 	// login
-	UpdateLoginSimple()
-	if conf.Http.Old_EnableSimpleLogin {
-		p := conf.Http.Old_PathPrefix + "login/"
-		// Router.StaticFile(p, loginSimpleFilePath)
-		Router.GET(p, loginSimpleHandler)
-		Router.HEAD(p, loginSimpleHandler)
-		Router.POST(p, loginSimpleHandler)
-	} else {
-		if conf.Http.Old_PathPrefix == "/" {
-			r := func(ctx *gin.Context) {
-				ctx.Redirect(302, "/login/icon/BCSP-64x64.png")
-			}
-			Router.GET("/favicon.ico", r)
-			Router.HEAD("/favicon.ico", r)
+	if conf.Http.Old_PathPrefix == "/" {
+		r := func(ctx *gin.Context) {
+			ctx.Redirect(302, "/login/icon/BCSP-64x64.png")
 		}
-		p := conf.Http.Old_PathPrefix + "login/"
-		Router.Static(p, "./src/web-login/dist")
-		Router.POST(p, func(ctx *gin.Context) {
-			ctx.Redirect(303, p)
-		})
+		Router.GET("/favicon.ico", r)
+		Router.HEAD("/favicon.ico", r)
 	}
+	p := conf.Http.Old_PathPrefix + "login/"
+	Router.Static(p, "./src/web-login/dist")
+	Router.POST(p, func(ctx *gin.Context) {
+		ctx.Redirect(303, p)
+	})
 
 	// web
 	Router.StaticFile(conf.Http.Old_PathPrefix, "./src/web/dist/index.html")
@@ -94,20 +83,6 @@ func UpdateRouter() {
 
 	// api-login
 	routerApiLoginInit()
-}
-
-func UpdateLoginSimple() {
-	if !conf.Http.Old_EnableSimpleLogin {
-		// loginSimpleFileLastModified = ""
-		loginSimpleFileEtag = ""
-		return
-	}
-	fi, err := os.Stat(loginSimpleFilePath)
-	if err == nil {
-		Router.LoadHTMLFiles(loginSimpleFilePath)
-		// loginSimpleFileLastModified = TimeToLastModified(fi.ModTime())
-		loginSimpleFileEtag = fmt.Sprint("W/\"", ColorScheme, ",", TimeToLastModified(fi.ModTime()), "\"")
-	}
 }
 
 func RobotsTxtHandler(ctx *gin.Context) {

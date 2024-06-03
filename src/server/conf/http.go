@@ -45,9 +45,6 @@ type ConfigHttpType struct {
 
 	Old_EnableH2c bool
 	New_EnableH2c bool
-
-	Old_EnableSimpleLogin bool
-	New_EnableSimpleLogin bool
 }
 
 var Http = &ConfigHttpType{}
@@ -160,7 +157,4 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 
 	// HTTP/2 H2C 默认关
 	c.New_EnableH2c, _ = viper.Get("enable_h2c").(bool)
-
-	// 极简版登录页面，默认关
-	c.New_EnableSimpleLogin, _ = viper.Get("enable_simple_login").(bool)
 }

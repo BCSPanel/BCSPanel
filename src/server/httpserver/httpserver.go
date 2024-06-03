@@ -79,9 +79,7 @@ func Reload() {
 		// 改变了H2C开启状态
 		(!conf.Ssl.New_EnableSsl && conf.Http.Old_EnableH2c != conf.Http.New_EnableH2c) ||
 		// 更改了路径开头
-		conf.Http.Old_PathPrefix != conf.Http.New_PathPrefix ||
-		// 启用或禁用了极简版登录页
-		conf.Http.Old_EnableSimpleLogin != conf.Http.New_EnableSimpleLogin {
+		conf.Http.Old_PathPrefix != conf.Http.New_PathPrefix {
 		// 那么
 		// 重启 ServerHttp
 		mylog.INFOln("http Reload ServerHttp")
@@ -102,7 +100,6 @@ func Reload() {
 		}
 	}
 	httprouter.UpdateColorScheme()
-	httprouter.UpdateLoginSimple()
 	httprouter.UPdate404html()
 }
 
