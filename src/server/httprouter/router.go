@@ -13,14 +13,6 @@ import (
 var Router *gin.Engine
 var GzipHandler gin.HandlerFunc
 
-const loginSimpleFileName = "login-simple.html"
-const loginSimpleFilePath = "./src/web-login-simple/" + loginSimpleFileName
-
-// https://github.com/golang/go/issues/66807
-// var loginSimpleFileLastModified = ""
-
-var loginSimpleFileEtag = ""
-
 func Init() {
 	// UpdateRouter()
 }
@@ -160,20 +152,15 @@ func myRouter(ctx *gin.Context) {
 	}
 
 	// 缓存
-	if compiledRegExp_myRouter_cacheControl_assets.MatchString(Path) {
-		// assets缓存1天，代理服务器也可以缓存
-		WH.Add("Cache-Control", "max-age=86400, public")
-	} else {
-		// 必须向服务器确认有效
-		WH.Add("Cache-Control", "no-cache")
-	}
+	// 必须向服务器确认有效
+	WH.Add("Cache-Control", "no-cache")
 
-	// 继续执行别的操作，完成了再回来
-	ctx.Next()
+	// // 继续执行别的操作，完成了再回来
+	// ctx.Next()
 
-	// 似乎发生了错误，尝试移除缓存标头。
-	// 只要没开始写正文就能移除，移除不了也不会报错。
-	if ctx.Writer.Status() >= 400 {
-		WH.Del("Cache-Control")
-	}
+	// // 似乎发生了错误，尝试移除缓存标头。
+	// // 只要没开始写正文就能移除，移除不了也不会报错。
+	// if ctx.Writer.Status() >= 400 {
+	// 	WH.Del("Cache-Control")
+	// }
 }
