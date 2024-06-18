@@ -8,7 +8,7 @@ require (
 )
 
 require (
-	github.com/bddjr/hlfhr v0.0.4 // indirect
+	github.com/bddjr/hlfhr v0.0.5 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect

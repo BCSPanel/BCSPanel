@@ -1,5 +1,7 @@
 github.com/bddjr/hlfhr v0.0.4 h1:Vb5Bc23wGwvrjVogiRDYaSl1OlB1EamAq+XeJlTwZa8=
 github.com/bddjr/hlfhr v0.0.4/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
+github.com/bddjr/hlfhr v0.0.5 h1:TMCr4GOa4H7N8SkLp6iLmSilQ++flI+9jLg4zJLa6CA=
+github.com/bddjr/hlfhr v0.0.5/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
