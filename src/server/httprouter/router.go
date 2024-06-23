@@ -88,22 +88,25 @@ func RobotsTxtHandler(ctx *gin.Context) {
 func myRouter(ctx *gin.Context) {
 	// fmt.Println("myRouter")
 
-	WH := ctx.Writer.Header()
 	Hostname := RequestHostname(ctx.Request)
 	// 如果与已允许的 Host 不匹配，返回421
 	if conf.Ssl_NeedToReturn421ForUnknownServername(Hostname) {
 		ctx.AbortWithStatus(421)
 		return
 	}
+
+	WH := ctx.Writer.Header()
 	// 标头防搜索引擎
 	if conf.Robots.EnableXRobotsTag {
-		WH.Add("X-Robots-Tag", "noindex, nofollow")
+		WH.Set("X-Robots-Tag", "noindex, nofollow")
 	}
+	// 缓存必须向服务器确认有效
+	WH.Set("Cache-Control", "no-cache")
 
 	// 如果ssl开启
 	if conf.Ssl.Old_EnableSsl && conf.Ssl.Only_HSTS != "" {
 		// HSTS
-		WH.Add("Strict-Transport-Security", conf.Ssl.Only_HSTS)
+		WH.Set("Strict-Transport-Security", conf.Ssl.Only_HSTS)
 	}
 
 	// 请求路径
@@ -118,7 +121,7 @@ func myRouter(ctx *gin.Context) {
 
 	// 如果路径开头错误
 	if !strings.HasPrefix(Path, conf.Http.Old_PathPrefix) {
-		WH.Add("Cache-Control", "no-cache")
+		// 继续
 		return
 	}
 
@@ -143,24 +146,10 @@ func myRouter(ctx *gin.Context) {
 	} else if compiledRegExp_myRouter_notLoggedIn401.MatchString(Path) {
 		// 未登录，不能访问私密api或私密文件
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			WH.Del("Cache-Control")
-			WH.Add("Refresh", fmt.Sprint("0; URL=", conf.Http.Old_PathPrefix, "login/"))
+			WH.Set("Refresh", fmt.Sprint("0; URL=", conf.Http.Old_PathPrefix, "login/"))
 			ctx.Data(401, gin.MIMEHTML, []byte("401 Unauthorized\n"))
 			ctx.Abort()
 			return
 		}
 	}
-
-	// 缓存
-	// 必须向服务器确认有效
-	WH.Add("Cache-Control", "no-cache")
-
-	// // 继续执行别的操作，完成了再回来
-	// ctx.Next()
-
-	// // 似乎发生了错误，尝试移除缓存标头。
-	// // 只要没开始写正文就能移除，移除不了也不会报错。
-	// if ctx.Writer.Status() >= 400 {
-	// 	WH.Del("Cache-Control")
-	// }
 }

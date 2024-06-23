@@ -27,7 +27,7 @@ func UPdate404html() {
 }
 
 func _404Handler(ctx *gin.Context) {
-	ctx.Writer.Header().Del("Cache-Control")
+	// ctx.Writer.Header().Del("Cache-Control")
 	ctx.Data(404, gin.MIMEHTML, _404html)
 }
 
