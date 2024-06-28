@@ -24,8 +24,8 @@ type ConfigHttpType struct {
 	New_Server80Port string
 
 	// 5
-	Old_GzipLevel int16
-	New_GzipLevel int16
+	Old_GzipLevel int
+	New_GzipLevel int
 
 	// 1024
 	Old_GzipMinContentLength int64
@@ -37,8 +37,8 @@ type ConfigHttpType struct {
 
 	Only_EnableGinLog bool
 
-	Old_KeepAliveSecond uint
-	New_KeepAliveSecond uint
+	Old_KeepAliveSecond int
+	New_KeepAliveSecond int
 
 	Only_EnableXRealIp  bool
 	Only_XForwarderAuth string
@@ -66,7 +66,7 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 		c.New_GzipMinContentLength = 1024
 		c.New_PathPrefix = "/"
 		c.Only_EnableGinLog = true
-		c.New_KeepAliveSecond = 10
+		c.New_KeepAliveSecond = 180
 		c.New_EnableH2c = false
 		return
 	}
@@ -111,7 +111,7 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 
 	// http服务Gzip压缩等级，默认5
 	var ok bool
-	c.New_GzipLevel, ok = viper.Get("gzip_level").(int16)
+	c.New_GzipLevel, ok = viper.Get("gzip_level").(int)
 	if !ok {
 		c.New_GzipLevel = 5
 	}
@@ -141,10 +141,10 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 		c.Only_EnableGinLog = true
 	}
 
-	// http服务keepAlive时长（秒），默认10
-	c.New_KeepAliveSecond, ok = viper.Get("keep_alive_second").(uint)
+	// http服务keepAlive时长（秒），默认180
+	c.New_KeepAliveSecond, ok = viper.Get("keep_alive_second").(int)
 	if !ok {
-		c.New_KeepAliveSecond = 10
+		c.New_KeepAliveSecond = 180
 	}
 
 	// 启用识别客户端IP优先采用请求头 X-Real-Ip

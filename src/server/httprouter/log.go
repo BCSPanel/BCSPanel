@@ -10,9 +10,9 @@ import (
 
 var GinLoggerWithFormat = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) (v string) {
 	mylog.UpdateWriter()
-	v = fmt.Sprint("GIN ",
+	v = fmt.Sprint(
 		// 时间
-		param.TimeStamp.Format("15:04:05"), " ",
+		param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
 		// 客户端IP
 		param.ClientIP, " ",
 		// 状态码

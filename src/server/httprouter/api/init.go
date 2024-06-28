@@ -1,0 +1,5 @@
+package httprouterapi
+
+func routerApiInit() {
+
+}

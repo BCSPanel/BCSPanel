@@ -21,7 +21,7 @@ func UpdateGzipHandler() {
 	mylog.INFOf("http GzipLevel %d , GzipMinContentLength %d\n", conf.Http.Old_GzipLevel, conf.Http.Old_GzipMinContentLength)
 	GzipHandler = gzip.NewHandler(gzip.Config{
 		// gzip compression level to use
-		CompressionLevel: int(conf.Http.Old_GzipLevel),
+		CompressionLevel: conf.Http.Old_GzipLevel,
 		// minimum content length to trigger gzip, the unit is in byte.
 		MinContentLength: conf.Http.Old_GzipMinContentLength,
 		// RequestFilter decide whether or not to compress response judging by request.

@@ -1,8 +1,7 @@
 package httprouter
 
 import (
-	"fmt"
-	"strings"
+	"net/http"
 
 	"github.com/bddjr/BCSPanel/src/server/conf"
 	"github.com/bddjr/BCSPanel/src/server/mylog"
@@ -28,16 +27,15 @@ func UpdateRouter() {
 	UpdateGzipHandler()
 	UPdate404html()
 	UpdateColorScheme()
-	updateRegexp()
 
 	// 创建新的路由
 	Router = gin.New()
-	// 会返回不支持的方法
 	Router.HandleMethodNotAllowed = true
+	Router.RedirectFixedPath = true
 	// 中间件
 	Router.Use(
 		GinLoggerHandler,
-		myRouter,
+		mainUse,
 	)
 	if GzipHandler != nil {
 		Router.Use(GzipHandler)
@@ -46,38 +44,57 @@ func UpdateRouter() {
 	Router.NoRoute(_404Handler)
 
 	// robots.txt
-	Router.GET("/robots.txt", RobotsTxtHandler)
-	Router.HEAD("/robots.txt", RobotsTxtHandler)
-
-	// login
-	if conf.Http.Old_PathPrefix == "/" {
-		r := func(ctx *gin.Context) {
-			ctx.Redirect(302, "/login/icon/BCSP-64x64.png")
-		}
-		Router.GET("/favicon.ico", r)
-		Router.HEAD("/favicon.ico", r)
-	}
-	p := conf.Http.Old_PathPrefix + "login/"
-	Router.Static(p, "./src/web-login/dist")
-	Router.POST(p, func(ctx *gin.Context) {
-		ctx.Redirect(303, p)
-	})
+	Router.GET("/robots.txt", robotsTxtHandler)
+	Router.HEAD("/robots.txt", robotsTxtHandler)
 
 	// web
-	Router.StaticFile(conf.Http.Old_PathPrefix, "./src/web/dist/index.html")
-	Router.Static(conf.Http.Old_PathPrefix+"assets/", "./src/web/dist/assets/")
-	Router.Static(conf.Http.Old_PathPrefix+"icon/", "./src/web/dist/icon/")
+	Router.GET(conf.Http.Old_PathPrefix, indexHtmlHandler)
+	Router.HEAD(conf.Http.Old_PathPrefix, indexHtmlHandler)
+	{
+		// assets
+		g := Router.Group(conf.Http.Old_PathPrefix + "assets/")
+		g.Use(checkNotLoggedIn401)
+		g.Static("/", "./src/web/dist/assets/")
+	}
+	{
+		// icon
+		g := Router.Group(conf.Http.Old_PathPrefix + "icon/")
+		g.Use(checkNotLoggedIn401)
+		g.Static("/", "./src/web/dist/icon/")
+	}
 
-	// ok
-	Router.GET(conf.Http.Old_PathPrefix+"ok", func(ctx *gin.Context) {
-		ctx.String(200, "ok")
-	})
+	// login
+	{
+		g := Router.Group(conf.Http.Old_PathPrefix + "login/")
+		g.GET("/", loginHtmlHandler)
+		g.HEAD("/", loginHtmlHandler)
+		g.Static("/assets/", "./src/web-login/dist/assets/")
+		g.Static("/config/", "./src/web-login/dist/config/")
+		g.Static("/icon/", "./src/web-login/dist/icon/")
+		g.Static("/ie/", "./src/web-login/dist/ie/")
+	}
 
 	// api-login
 	routerApiLoginInit()
 }
 
-func RobotsTxtHandler(ctx *gin.Context) {
+func indexHtmlHandler(ctx *gin.Context) {
+	if !mysession.CheckLoggedInCookieForCtx(ctx) {
+		ctx.Redirect(303, "./login/")
+		return
+	}
+	http.ServeFile(ctx.Writer, ctx.Request, "./src/web/dist/index.html")
+}
+
+func loginHtmlHandler(ctx *gin.Context) {
+	if mysession.CheckLoggedInCookieForCtx(ctx) {
+		ctx.Redirect(303, "../")
+		return
+	}
+	http.ServeFile(ctx.Writer, ctx.Request, "./src/web-login/dist/index.html")
+}
+
+func robotsTxtHandler(ctx *gin.Context) {
 	if !conf.Robots.EnableRobotsTxt {
 		_404Handler(ctx)
 		return
@@ -85,16 +102,13 @@ func RobotsTxtHandler(ctx *gin.Context) {
 	ctx.Data(200, gin.MIMEPlain, []byte("User-agent: *\nDisallow: /\n"))
 }
 
-func myRouter(ctx *gin.Context) {
-	// fmt.Println("myRouter")
-
-	Hostname := RequestHostname(ctx.Request)
-	// 如果与已允许的 Host 不匹配，返回421
-	if conf.Ssl_NeedToReturn421ForUnknownServername(Hostname) {
-		ctx.AbortWithStatus(421)
-		return
+func checkNotLoggedIn401(ctx *gin.Context) {
+	if !mysession.CheckLoggedInCookieForCtx(ctx) {
+		ctx.AbortWithStatus(401)
 	}
+}
 
+func mainUse(ctx *gin.Context) {
 	WH := ctx.Writer.Header()
 	// 标头防搜索引擎
 	if conf.Robots.EnableXRobotsTag {
@@ -102,54 +116,8 @@ func myRouter(ctx *gin.Context) {
 	}
 	// 缓存必须向服务器确认有效
 	WH.Set("Cache-Control", "no-cache")
-
-	// 如果ssl开启
+	// HSTS
 	if conf.Ssl.Old_EnableSsl && conf.Ssl.Only_HSTS != "" {
-		// HSTS
 		WH.Set("Strict-Transport-Security", conf.Ssl.Only_HSTS)
-	}
-
-	// 请求路径
-	Path := ctx.Request.URL.Path
-
-	// 路径不能有连在一起的多个斜杠
-	if compiledRegExp_myRouter_moreSlash.MatchString(Path) {
-		ctx.Redirect(301, compiledRegExp_myRouter_moreSlash.ReplaceAllString(Path, "/"))
-		ctx.Abort()
-		return
-	}
-
-	// 如果路径开头错误
-	if !strings.HasPrefix(Path, conf.Http.Old_PathPrefix) {
-		// 继续
-		return
-	}
-
-	// 裁剪 /bcspanel/ => /
-	Path = Path[len(conf.Http.Old_PathPrefix)-1:]
-
-	// 涉及到某些目录时，检查用户有没有登录
-	if Path == "/" {
-		// 未登录，网页重定向到login
-		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			ctx.Redirect(303, "./login/")
-			ctx.Abort()
-			return
-		}
-	} else if Path == "/login/" {
-		// 已登录，重定向到/
-		if mysession.CheckLoggedInCookieForCtx(ctx) {
-			ctx.Redirect(303, "../")
-			ctx.Abort()
-			return
-		}
-	} else if compiledRegExp_myRouter_notLoggedIn401.MatchString(Path) {
-		// 未登录，不能访问私密api或私密文件
-		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			WH.Set("Refresh", fmt.Sprint("0; URL=", conf.Http.Old_PathPrefix, "login/"))
-			ctx.Data(401, gin.MIMEHTML, []byte("401 Unauthorized\n"))
-			ctx.Abort()
-			return
-		}
 	}
 }

@@ -23,11 +23,11 @@ type LoginJson struct {
 }
 
 func routerApiLoginInit() {
-	Router.GET(conf.Http.Old_PathPrefix+"api-login/color-scheme", colorSchemeHandler)
-	Router.POST(conf.Http.Old_PathPrefix+"api-login/login", loginHandler)
-	pathLogout := conf.Http.Old_PathPrefix + "api-login/logout"
-	Router.POST(pathLogout, logoutHandler)
-	Router.GET(pathLogout, logoutHandler)
+	g := Router.Group(conf.Http.Old_PathPrefix + "api-login/")
+	g.GET("/color-scheme", colorSchemeHandler)
+	g.GET("/login", loginHandler)
+	g.POST("/logout", logoutHandler)
+	g.GET("/logout", logoutHandler)
 }
 
 func loginHandler(ctx *gin.Context) {
@@ -38,7 +38,9 @@ func loginHandler(ctx *gin.Context) {
 	var loginJson = &LoginJson{}
 	err := ctx.BindJSON(loginJson)
 	if err != nil {
-		ctx.AbortWithError(400, err)
+		ctx.Status(400)
+		ctx.Writer.WriteString(err.Error())
+		ctx.Error(err)
 		return
 	}
 
@@ -55,12 +57,12 @@ func loginHandler(ctx *gin.Context) {
 		// 失败
 		ctx.Status(401)
 		ctx.Writer.WriteString(err.Error())
-		ctx.Abort()
+		ctx.Error(err)
 		return
 	}
 	// 成功
 	ctx.Writer.Header().Set("Set-Cookie", cookie.String())
-	ctx.AbortWithStatus(200)
+	ctx.Status(200)
 }
 
 func logoutHandler(ctx *gin.Context) {

@@ -41,7 +41,7 @@ func Init() {
 		panic(fmt.Errorf("mylog error writing file: %v", err))
 	}
 
-	log.SetFlags(log.Ltime)
+	// log.SetFlags(log.Ltime)
 	INFOln("Start BCSPanel")
 }
 
@@ -73,67 +73,61 @@ func CloseFile() {
 }
 
 // ln
-func logger_ln(prefix string, v ...any) {
+func Logger_ln(prefix string, v ...any) {
 	logLock.Lock()
 	defer logLock.Unlock()
 	UpdateWriter()
-	log.SetPrefix(prefix)
-	log.Println(v...)
-	log.SetPrefix("---- ")
+	log.Println("[" + prefix + "] " + fmt.Sprint(v...))
 }
 
 func INFOln(v ...any) {
-	logger_ln("INFO ", v...)
+	Logger_ln("INFO", v...)
 }
 
 func WARNln(v ...any) {
-	logger_ln("WARN ", v...)
+	Logger_ln("WARN", v...)
 }
 
 func ERRORln(v ...any) {
-	logger_ln("ERROR ", v...)
+	Logger_ln("ERROR", v...)
 }
 
 // f
-func logger_f(prefix string, format string, v ...any) {
+func Logger_f(prefix string, format string, v ...any) {
 	logLock.Lock()
 	defer logLock.Unlock()
 	UpdateWriter()
-	log.SetPrefix(prefix)
-	log.Printf(format, v...)
-	log.SetPrefix("---- ")
+	log.Printf("["+prefix+"] "+format, v...)
 }
 
 func INFOf(format string, v ...any) {
-	logger_f("INFO ", format, v...)
+	Logger_f("INFO", format, v...)
 }
 
 func WARNf(format string, v ...any) {
-	logger_f("WARN ", format, v...)
+	Logger_f("WARN", format, v...)
 }
 
 func ERRORf(format string, v ...any) {
-	logger_f("ERROR ", format, v...)
+	Logger_f("ERROR", format, v...)
 }
 
 // .
-func logger(prefix string, v ...any) {
+func Logger(prefix string, v ...any) {
 	logLock.Lock()
 	defer logLock.Unlock()
 	UpdateWriter()
-	log.SetPrefix(prefix)
-	log.Print(v...)
-	log.SetPrefix("---- ")
+	log.Print("[" + prefix + "] " + fmt.Sprint(v...))
 }
 
 func INFO(v ...any) {
-	logger("INFO ", v...)
+	Logger("INFO", v...)
 }
 
 func WARN(v ...any) {
-	logger("WARN ", v...)
+	Logger("WARN", v...)
 }
 
 func ERROR(v ...any) {
-	logger("ERROR ", v...)
+	Logger("ERROR", v...)
 }

@@ -123,11 +123,10 @@ func ServerHttpListen() {
 	ServerHttp = hlfhr.New(&http.Server{
 		Addr:              conf.Http.Old_ServerHttpPort,
 		Handler:           httprouter.Router.Handler(),
-		MaxHeaderBytes:    8 << 10, //8KB
 		ReadHeaderTimeout: 10 * time.Second,
 	})
 	// 是否保持连接
-	if conf.Http.Old_KeepAliveSecond == 0 {
+	if conf.Http.Old_KeepAliveSecond < 0 {
 		// 否
 		ServerHttp.SetKeepAlivesEnabled(false)
 	} else {
@@ -146,7 +145,7 @@ func ServerHttpListen() {
 			ServerHttp.TLSNextProto = map[string]func(*http.Server, *tls.Conn, http.Handler){}
 		}
 		ServerHttp.TLSConfig = &tls.Config{
-			GetCertificate: conf.Ssl_GetCertificate,
+			GetCertificate: conf.Ssl.GetNameToCert,
 		}
 		err = ServerHttp.ListenAndServeTLS("", "")
 	}
@@ -170,8 +169,7 @@ func Server80Listen() {
 	mylog.INFOln("http Start Server80Listen")
 	Server80 = &http.Server{
 		Addr:              conf.Http.Old_Server80Port,
-		Handler:           httprouter.Server80Handler,
-		MaxHeaderBytes:    4 << 10, //4KB
+		Handler:           Server80Handler,
 		ReadHeaderTimeout: 10 * time.Second,
 	}
 	Server80.SetKeepAlivesEnabled(false)

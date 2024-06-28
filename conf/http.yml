@@ -9,7 +9,7 @@ listen: 24124
 
 # Gzip 压缩等级，等级越高越消耗 CPU 。
 # 参考 https://pkg.go.dev/github.com/nanmu42/gzip@v1.2.0#Config.CompressionLevel
-# 类型: int16
+# 类型: int
 # 默认: 5
 # 最高: 9
 # 关闭: 0
@@ -35,10 +35,11 @@ path_prefix: /
 enable_gin_log: true
 
 # 空闲时继续保持连接直到超过多少秒。
-# 类型: uint
-# 默认: 10
-# 关闭保持连接: 0
-keep_alive_second: 0
+# 类型: int
+# 默认: 180
+# 永久: 0
+# 关闭保持连接: -1
+keep_alive_second: 180
 
 # 启用识别客户端IP优先采用请求头 X-Real-Ip
 # 类型: bool

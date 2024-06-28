@@ -3,7 +3,7 @@
 # 启用 HTTPS 。
 # 类型: bool
 # 默认: false
-enable: false
+enable: true
 
 # 启用 80 端口监听 HTTP ，用于重定向到 HTTPS 端口。
 # 仅 HTTPS 端口是 443 的时候有效。
@@ -21,11 +21,6 @@ enable_listen_80_redirect: true
 # 1年: "max-age=31536000"
 # 禁用: "max-age=0"
 hsts: ""
-
-# 如果启用，当访问者使用的 Host 标头的域名不在允许的范围内，返回 421 状态码错误。
-# 类型: bool
-# 默认: false
-enable_unknown_servername_send_421: false
 
 # 启用 HTTP/2 。
 # 类型: bool
