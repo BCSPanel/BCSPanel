@@ -21,8 +21,6 @@ type ConfigSslType struct {
 
 	Only_EnableListen80Redirect bool
 	Only_EnableHttp2            bool
-
-	Only_HSTS string
 }
 
 var Ssl = &ConfigSslType{}
@@ -55,9 +53,6 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 		c.Only_EnableListen80Redirect = true
 	}
 
-	// HSTS，默认不添加
-	c.Only_HSTS, _ = viper.Get("hsts").(string)
-
 	// 开启http2，仅开启HTTPS时有效，默认开
 	c.Only_EnableHttp2, ok = viper.Get("enable_http2").(bool)
 	if !ok {
@@ -86,20 +81,22 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 	if !ok {
 		return
 	}
-	for i := 0; i < len(ymlCerts); i++ {
-		j := ymlCerts[i].(map[string]interface{})
-		certPath := path.Join("./conf/cert", j["cert"].(string))
-		keyPath := path.Join("./conf/cert", j["key"].(string))
+	for _, v := range ymlCerts {
+		item := v.(map[string]interface{})
+		certName := item["cert"].(string)
+		certPath := path.Join("./conf/cert", certName)
+		keyName := item["key"].(string)
+		keyPath := path.Join("./conf/cert", keyName)
 		// 证书与密钥
 		cert, err := tls.LoadX509KeyPair(certPath, keyPath)
 		if err != nil {
-			mylog.ERRORf("Can not read cert \"%s\" , %v\n", j["cert"].(string), err)
+			mylog.ERRORf("Can not read cert \"%s\" , %v\n", certName, err)
 			continue
 		}
 		// 解析证书
 		Certificate, err := x509.ParseCertificate(cert.Certificate[0])
 		if err != nil {
-			mylog.ERRORf("Can not parse cert \"%s\" , %v\n", j["cert"].(string), err)
+			mylog.ERRORf("Can not parse cert \"%s\" , %v\n", certName, err)
 			continue
 		}
 		// 依据证书里的可选名称，自动匹配

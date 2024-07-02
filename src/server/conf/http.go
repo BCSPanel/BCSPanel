@@ -12,16 +12,16 @@ import (
 
 type ConfigHttpType struct {
 	// ":24124"
-	Old_ServerHttpPort string
-	New_ServerHttpPort string
+	Old_ServerHttpAddr string
+	New_ServerHttpAddr string
 
 	// 24124
 	Old_ServerHttpPortNumber uint16
 	New_ServerHttpPortNumber uint16
 
 	// ":80"
-	Old_Server80Port string
-	New_Server80Port string
+	Old_Server80Addr string
+	New_Server80Addr string
 
 	// 5
 	Old_GzipLevel int
@@ -35,7 +35,12 @@ type ConfigHttpType struct {
 	Old_PathPrefix string
 	New_PathPrefix string
 
+	Only_AddHeaders []map[string]string
+
 	Only_EnableGinLog bool
+
+	Old_EnableBasicLogin bool
+	New_EnableBasicLogin bool
 
 	Old_KeepAliveSecond int
 	New_KeepAliveSecond int
@@ -59,12 +64,14 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		mylog.ERRORln(err)
-		c.New_ServerHttpPort = ":24124"
+		c.New_ServerHttpAddr = ":24124"
 		c.New_ServerHttpPortNumber = 24124
-		c.New_Server80Port = ":80"
+		c.New_Server80Addr = ":80"
 		c.New_GzipLevel = 5
 		c.New_GzipMinContentLength = 1024
 		c.New_PathPrefix = "/"
+		c.Only_AddHeaders = nil
+		c.New_EnableBasicLogin = false
 		c.Only_EnableGinLog = true
 		c.New_KeepAliveSecond = 180
 		c.New_EnableH2c = false
@@ -72,40 +79,29 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 	}
 
 	// http服务tcp监听端口，默认24124
-	c.New_Server80Port = ":80"
-	if _ServerHttpPort, ok := viper.Get("listen").(int); ok {
+	c.New_Server80Addr = ":80"
+	if addr := viper.GetUint16("listen"); addr != 0 {
 		// int类型
-		c.New_ServerHttpPortNumber = ToUint16(_ServerHttpPort)
-		c.New_ServerHttpPort = fmt.Sprint(":", c.New_ServerHttpPortNumber)
+		c.New_ServerHttpPortNumber = addr
+		c.New_ServerHttpAddr = fmt.Sprint(":", addr)
 	} else {
 		// 可能是string类型
-		c.New_ServerHttpPort, _ = viper.Get("listen").(string)
+		c.New_ServerHttpAddr = viper.GetString("listen")
 		regexpPort := regexp.MustCompile(`:\d+$`)
-		if find := regexpPort.FindString(c.New_ServerHttpPort); find != "" {
-
+		if find := regexpPort.FindString(c.New_ServerHttpAddr); find != "" {
 			// ":24124" "0.0.0.0:24124"
 			n, _ := strconv.Atoi(find[1:])
-			c.New_ServerHttpPortNumber = ToUint16(n)
-			// ":99999" -> ":65535"
-			c.New_ServerHttpPort = regexpPort.ReplaceAllString(c.New_ServerHttpPort, fmt.Sprint(":", c.New_ServerHttpPortNumber))
+			c.New_ServerHttpPortNumber = uint16(n)
 			// "0.0.0.0:80"
-			c.New_Server80Port = regexpPort.ReplaceAllString(c.New_ServerHttpPort, ":80")
-
-		} else if matched, _ := regexp.MatchString(`^\d+$`, c.New_ServerHttpPort); matched {
-
+			c.New_Server80Addr = regexpPort.ReplaceAllString(c.New_ServerHttpAddr, ":80")
+		} else if n, err := strconv.Atoi(c.New_ServerHttpAddr); err == nil {
 			// "24124"
-			n, _ := strconv.Atoi(c.New_ServerHttpPort)
-			c.New_ServerHttpPortNumber = ToUint16(n)
-			// ":24124"
-			c.New_ServerHttpPort = fmt.Sprint(":", c.New_ServerHttpPort)
-
+			c.New_ServerHttpPortNumber = uint16(n)
 		} else {
-
 			// "0.0.0.0" ""
 			c.New_ServerHttpPortNumber = 24124
-			c.New_Server80Port = c.New_ServerHttpPort + ":80"
-			c.New_ServerHttpPort += ":24124"
-
+			c.New_Server80Addr = c.New_ServerHttpAddr + ":80"
+			c.New_ServerHttpAddr += ":24124"
 		}
 	}
 
@@ -125,15 +121,34 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 
 	// http服务路由前缀
 	c.New_PathPrefix, _ = viper.Get("path_prefix").(string)
-	if !strings.HasSuffix(c.New_PathPrefix, "/") {
-		c.New_PathPrefix += "/"
-	}
 	if !strings.HasPrefix(c.New_PathPrefix, "/") {
 		c.New_PathPrefix = "/" + c.New_PathPrefix
+	}
+	if !strings.HasSuffix(c.New_PathPrefix, "/") {
+		c.New_PathPrefix += "/"
 	}
 	if b, _ := regexp.MatchString(`^/[0-9a-zA-Z]+/$`, c.New_PathPrefix); !b {
 		c.New_PathPrefix = "/"
 	}
+
+	// 添加响应头
+	if addHeaders, ok := viper.Get("add_headers").([]interface{}); ok {
+		newHeaders := make([]map[string]string, len(addHeaders))
+		for k, v := range addHeaders {
+			item := v.(map[string]interface{})
+			newHeaders[k] = make(map[string]string)
+			h := newHeaders[k]
+			for k, v := range item {
+				h[k] = fmt.Sprint(v)
+			}
+		}
+		c.Only_AddHeaders = newHeaders
+	} else {
+		c.Only_AddHeaders = nil
+	}
+
+	// 使用Basic登录
+	c.New_EnableBasicLogin, _ = viper.Get("enable_basic_login").(bool)
 
 	// http服务打印Gin框架的日志
 	c.Only_EnableGinLog, ok = viper.Get("enable_gin_log").(bool)

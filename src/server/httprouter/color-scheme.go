@@ -5,17 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var ColorScheme = ""
+type apiColorScheme struct{}
 
-func UpdateColorScheme() {
-	switch conf.ConfigConfig.ColorScheme {
-	case "light", "dark":
-		ColorScheme = conf.ConfigConfig.ColorScheme
-	default:
-		ColorScheme = ""
-	}
-}
-
-func colorSchemeHandler(ctx *gin.Context) {
-	ctx.String(200, ColorScheme)
+func (a apiColorScheme) Init(apiGroup *gin.RouterGroup) {
+	apiGroup.GET("/color-scheme", func(ctx *gin.Context) {
+		ctx.String(200, conf.ConfigConfig.ColorScheme)
+	})
 }

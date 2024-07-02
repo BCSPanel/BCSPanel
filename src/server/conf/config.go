@@ -18,13 +18,8 @@ var ConfigConfig = &ConfigConfigType{}
 func UpdateConfig() {
 	Cmdport.UpdateConfig_cmdport()
 	Http.UpdateConfig_http()
-	Robots.UpdateConfig_robots()
 	Ssl.UpdateConfig_ssl()
 	ConfigConfig.UpdateConfig_config()
-}
-
-func ToUint16(n int) uint16 {
-	return uint16(max(0, min(n, 65535)))
 }
 
 func (c *ConfigConfigType) UpdateConfig_config() {

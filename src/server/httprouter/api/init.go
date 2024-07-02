@@ -1,5 +1,0 @@
-package httprouterapi
-
-func routerApiInit() {
-
-}

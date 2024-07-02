@@ -53,6 +53,18 @@ enable_x_real_ip: false
 # 不安全的演示: "123456"
 x_forwarder_auth: ""
 
+# 添加响应头
+add_headers:
+  - X-Robots-Tag: noindex, nofollow
+  # - Server: BCSPanel
+  # - Strict-Transport-Security: max-age=31536000
+
+# 使用Basic登录（开启后不支持注册）
+# 原理参考 https://developer.mozilla.org/docs/Web/HTTP/Authentication
+# 类型: bool
+# 默认: false
+enable_basic_login: false
+
 # （实验性）启用 HTTP/2 H2C 协议。
 # 不建议启用，主流浏览器都不支持，反向代理稳定性未知。
 # 该配置在使用 HTTPS 时不会生效。

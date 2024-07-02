@@ -25,14 +25,12 @@ func (c *ConfigCmdportType) UpdateConfig_cmdport() {
 	err := viper.ReadInConfig()
 	if err != nil {
 		mylog.ERRORln(err)
-		c.OldPort = 39625
+		c.NewPort = 39625
 		return
 	}
 
-	port, ok := viper.Get("cmd_port").(int)
-	if !ok {
+	c.NewPort = viper.GetUint16("cmd_port")
+	if c.NewPort == 0 {
 		c.NewPort = 39625
-	} else {
-		c.NewPort = ToUint16(port)
 	}
 }
