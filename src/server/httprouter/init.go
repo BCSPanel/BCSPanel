@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net/url"
 	"os"
-	"strconv"
 
 	"github.com/bddjr/BCSPanel/src/server/conf"
 	"github.com/bddjr/BCSPanel/src/server/mylog"
 	"github.com/bddjr/BCSPanel/src/server/mysession"
+	"github.com/bddjr/basiclogin-gin"
 	"github.com/gin-gonic/gin"
 	"github.com/nanmu42/gzip"
 )
@@ -123,8 +123,18 @@ func GetRouter() *gin.Engine {
 	// login
 	loginGroup := mainGroup.Group("login")
 	if conf.Http.Old_EnableBasicLogin {
+		// 使用basic登录页面
+		loginGroup.Use(handlerRemoveQuery, func(ctx *gin.Context) {
+			if mysession.CheckLoggedInCookieForCtx(ctx) {
+				// 已登录
+				ctx.Redirect(303, conf.Http.Old_PathPrefix)
+				ctx.Abort()
+				return
+			}
+		})
 		apiLogin{}.InitBasic(loginGroup)
 	} else {
+		// 使用完整登录页面
 		const dist = "./src/web-login/dist/"
 		loginGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
@@ -138,9 +148,6 @@ func GetRouter() *gin.Engine {
 		for _, name := range []string{"assets", "icon", "config", "ie"} {
 			loginGroup.Static(name, dist+name)
 		}
-		loginGroup.GET("/basic/*any", func(ctx *gin.Context) {
-			ctx.Redirect(302, conf.Http.Old_PathPrefix+"login/")
-		})
 	}
 
 	// api
@@ -187,7 +194,7 @@ func handlerRemoveQuery(ctx *gin.Context) {
 }
 
 func scriptRedirect(ctx *gin.Context, code int, path string) {
-	ctx.Data(code, gin.MIMEHTML, []byte(`<script>location.replace(`+strconv.Quote(path)+`)</script>`))
+	basiclogin.ScriptRedirect(ctx, code, path)
 }
 
 func getClientIP(ctx *gin.Context) string {

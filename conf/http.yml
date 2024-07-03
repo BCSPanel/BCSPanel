@@ -63,7 +63,7 @@ add_headers:
 # 原理参考 https://developer.mozilla.org/docs/Web/HTTP/Authentication
 # 类型: bool
 # 默认: false
-enable_basic_login: true
+enable_basic_login: false
 
 # （实验性）启用 HTTP/2 H2C 协议。
 # 不建议启用，主流浏览器都不支持，反向代理稳定性未知。

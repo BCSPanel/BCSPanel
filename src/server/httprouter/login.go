@@ -2,13 +2,11 @@ package httprouter
 
 import (
 	"net/http"
-	"strconv"
-	"strings"
-	"time"
 
 	"github.com/bddjr/BCSPanel/src/server/conf"
 	"github.com/bddjr/BCSPanel/src/server/mysession"
 	"github.com/bddjr/BCSPanel/src/server/user"
+	"github.com/bddjr/basiclogin-gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -79,88 +77,7 @@ func (a apiLogin) logoutHandler(ctx *gin.Context) {
 }
 
 func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
-	const tBase = 36
-	const cookieNameBasicLoginUsed = "BCSPanelBasicLoginUsed"
-
-	redirect := func(ctx *gin.Context) {
-		scriptRedirect(ctx, 400, conf.Http.Old_PathPrefix+"login/basic/"+strconv.FormatInt(time.Now().UnixMilli(), tBase)+"/")
-	}
-
-	loginGroup.Use(handlerRemoveQuery, func(ctx *gin.Context) {
-		if mysession.CheckLoggedInCookieForCtx(ctx) {
-			// 已登录，脚本重定向，防止客户端丢失缓存
-			scriptRedirect(ctx, 401, conf.Http.Old_PathPrefix)
-			ctx.Abort()
-			return
-		}
-		if !conf.Ssl.Old_EnableSsl {
-			ctx.Header("Referrer-Policy", "same-origin")
-		}
-	})
-	loginGroup.GET("/", redirect)
-	loginGroup.GET("/basic/", redirect)
-
-	loginGroup.GET("/basic/:t/", func(ctx *gin.Context) {
-		param := ctx.Param("t")
-
-		// 如果之前登录的时候用过这个时间戳，那么忽略本次提交，重新生成。
-		// 修复Firefox的bug。
-		cookieBasicLoginUsed, _ := ctx.Cookie(cookieNameBasicLoginUsed)
-		if cookieBasicLoginUsed == param {
-			redirect(ctx)
-			return
-		}
-		// 参数必须是有效的
-		paramTimeInt, err := strconv.ParseInt(param, tBase, 64)
-		if err != nil {
-			redirect(ctx)
-			return
-		}
-		// 检查cookie时间，防止复用更旧的地址
-		// 修复Firefox的bug。
-		if cookieBasicLoginUsed != "" {
-			cookieTimeInt, err := strconv.ParseInt(cookieBasicLoginUsed, tBase, 64)
-			if err == nil && cookieTimeInt > paramTimeInt {
-				redirect(ctx)
-				return
-			}
-		}
-		// 时间不能超过当前时间
-		paramTime := time.UnixMilli(paramTimeInt)
-		if paramTime.After(time.Now()) {
-			redirect(ctx)
-			return
-		}
-
-		// 使用secure
-		secure := conf.Ssl.Old_EnableSsl
-		if !secure {
-			// 检查Referer
-			referer := ctx.Request.Header.Get("Referer")
-			if referer == "" {
-				if paramTime.Add(3 * time.Second).After(time.Now()) {
-					// 参数时间戳对比当前时间戳，相差不超过2秒
-					// 浏览器不支持Referer
-					ctx.String(400, "Missing Referer Header")
-					return
-				}
-				redirect(ctx)
-				return
-			}
-			// 判断https
-			secure = strings.HasPrefix(referer, "https")
-		}
-
-		// 获取提交内容
-		username, password, ok := ctx.Request.BasicAuth()
-		if !ok {
-			// 未提交
-			ctx.Header("WWW-Authenticate", `Basic realm=`+ctx.Request.URL.Path+`, charset="UTF-8"`)
-			ctx.Status(401)
-			return
-		}
-		// 登录
-		ctx.SetCookie(cookieNameBasicLoginUsed, param, 0, conf.Http.Old_PathPrefix+"login/", "", secure, true)
+	basiclogin.New(loginGroup, func(ctx *gin.Context, username, password string, secure bool) {
 		cookie, err := user.Login(username, password, secure)
 		if err != nil {
 			// 失败

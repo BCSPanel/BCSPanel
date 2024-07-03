@@ -1,3 +1,5 @@
+github.com/bddjr/basiclogin-gin v0.0.1 h1:Ns08F7Zt6f4Qgr+kSC+6XA0rfmcqCXlkLh3xGncd/5Q=
+github.com/bddjr/basiclogin-gin v0.0.1/go.mod h1:tVYZaA674r1fwFQ/w8chZYCkNxKFBmBLzmCvc5CEemM=
 github.com/bddjr/hlfhr v0.2.1 h1:M+eEd7iG2cFkpgVdabLbSmeIEu/99Yt5NcVfLQYOCbA=
 github.com/bddjr/hlfhr v0.2.1/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
