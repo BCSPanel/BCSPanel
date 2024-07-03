@@ -60,11 +60,7 @@ func GetRouter() *gin.Engine {
 				}
 			}
 			wh.Set("Cache-Control", "no-cache")
-			if conf.Http.Old_EnableBasicLogin && !conf.Ssl.Old_EnableSsl {
-				wh.Set("Referrer-Policy", "same-origin")
-			} else {
-				wh.Set("Referrer-Policy", "no-referrer")
-			}
+			wh.Set("Referrer-Policy", "no-referrer")
 		},
 	)
 
@@ -109,11 +105,13 @@ func GetRouter() *gin.Engine {
 
 	// web
 	const dist = "./src/web/dist/"
-	mainGroup.GET("/", func(ctx *gin.Context) {
+	mainGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			ctx.Redirect(303, "./login/")
+			// 未登录，脚本重定向，防止客户端丢失缓存
+			scriptRedirect(ctx, 401, "./login/")
 			return
 		}
+		// 网页
 		ctx.File(dist + "index.html")
 	})
 	for _, name := range []string{"assets", "icon"} {
@@ -128,21 +126,21 @@ func GetRouter() *gin.Engine {
 		apiLogin{}.InitBasic(loginGroup)
 	} else {
 		const dist = "./src/web-login/dist/"
-		loginGroup.GET("/", func(ctx *gin.Context) {
+		loginGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
-				ctx.Redirect(303, "../")
+				// 已登录，脚本重定向，防止客户端丢失缓存
+				scriptRedirect(ctx, 401, "../")
 				return
 			}
-			if ctx.Request.Header.Get("Authorization") != "" {
-				// 客户端不要再发这个标头了
-				scriptRedirect(ctx, 401, "")
-				return
-			}
+			// 网页
 			ctx.File(dist + "index.html")
 		})
 		for _, name := range []string{"assets", "icon", "config", "ie"} {
 			loginGroup.Static(name, dist+name)
 		}
+		loginGroup.GET("/basic/*any", func(ctx *gin.Context) {
+			ctx.Redirect(302, conf.Http.Old_PathPrefix+"login/")
+		})
 	}
 
 	// api
@@ -177,6 +175,14 @@ var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams
 func handlerCheckNotLoggedIn401(ctx *gin.Context) {
 	if !mysession.CheckLoggedInCookieForCtx(ctx) {
 		ctx.AbortWithStatus(401)
+	}
+}
+
+func handlerRemoveQuery(ctx *gin.Context) {
+	if ctx.Request.URL.RawQuery != "" {
+		// 移除参数
+		ctx.Redirect(301, ctx.Request.URL.Path)
+		ctx.Abort()
 	}
 }
 
