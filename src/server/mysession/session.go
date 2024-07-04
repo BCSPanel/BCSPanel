@@ -154,12 +154,12 @@ func CheckLoggedInCookie(value string) (ok bool) {
 }
 
 func CheckLoggedInCookieForCtx(ctx *gin.Context) (ok bool) {
-	lock.Lock()
-	defer lock.Unlock()
 	value, err := ctx.Cookie(SessionCookieName)
 	if err != nil {
 		return
 	}
+	lock.Lock()
+	defer lock.Unlock()
 	session, ok := getLoggedInSession(value)
 	if !ok {
 		ctx.SetCookie(SessionCookieName, "x", -1, "", "", false, true)
@@ -210,14 +210,11 @@ func LogOutCookie(value string) (cookie *http.Cookie, ok bool) {
 }
 
 func LogOutSessionForRequest(req *http.Request) (cookie *http.Cookie, ok bool) {
-	lock.Lock()
-	defer lock.Unlock()
 	reqCookie, err := req.Cookie(SessionCookieName)
 	if err != nil {
 		return nil, false
 	}
-	_, cookie, ok = logOutCookie(reqCookie.Value)
-	return
+	return LogOutCookie(reqCookie.Value)
 }
 
 // 清除用户的所有会话
@@ -256,12 +253,12 @@ func LogOutUserFromRandomId(randomId string) {
 }
 
 func LogOutUserForRequest(req *http.Request) (cookie *http.Cookie, ok bool) {
-	lock.Lock()
-	defer lock.Unlock()
 	reqCookie, err := req.Cookie(SessionCookieName)
 	if err != nil {
 		return nil, false
 	}
+	lock.Lock()
+	defer lock.Unlock()
 	session, cookie, ok := logOutCookie(reqCookie.Value)
 	if ok {
 		logOutUserFromSession(session)
