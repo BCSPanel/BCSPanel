@@ -88,6 +88,6 @@ func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
 		// 成功
 		ctx.Writer.Header().Add("Set-Cookie", cookie.String())
 		ctx.Header("Referrer-Policy", "no-referrer")
-		scriptRedirect(ctx, 200, conf.Http.Old_PathPrefix)
+		scriptRedirect(ctx, 401, conf.Http.Old_PathPrefix)
 	})
 }
