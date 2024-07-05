@@ -16,8 +16,12 @@ import (
 )
 
 func apiInit(apiGroup *gin.RouterGroup) {
-	apiLogin{}.Init(apiGroup)
-	apiColorScheme{}.Init(apiGroup)
+	apiColorScheme{}.Init(apiGroup.Group("color-scheme"))
+	apiFiles{}.Init(apiGroup.Group("files"))
+	apiLogin{}.Init(apiGroup.Group("login"))
+	apiSettings{}.Init(apiGroup.Group("settings"))
+	apiTerminals{}.Init(apiGroup.Group("terminals"))
+	apiUsers{}.Init(apiGroup.Group("users"))
 }
 
 func GetRouter() *gin.Engine {

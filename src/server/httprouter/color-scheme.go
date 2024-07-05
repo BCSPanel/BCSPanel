@@ -7,8 +7,8 @@ import (
 
 type apiColorScheme struct{}
 
-func (a apiColorScheme) Init(apiGroup *gin.RouterGroup) {
-	apiGroup.GET("/color-scheme", func(ctx *gin.Context) {
+func (a apiColorScheme) Init(g *gin.RouterGroup) {
+	g.GET("/", func(ctx *gin.Context) {
 		ctx.String(200, conf.ConfigConfig.ColorScheme)
 	})
 }

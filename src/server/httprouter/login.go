@@ -25,13 +25,29 @@ type loginJson struct {
 
 type apiLogin struct{}
 
-func (a apiLogin) Init(apiGroup *gin.RouterGroup) {
-	g := apiGroup.Group("login")
-	g.POST("/login", a.loginHandler)
-	g.GET("/logout", a.logoutHandler)
+func (a apiLogin) Init(g *gin.RouterGroup) {
+	g.POST("/login", a.handlerLogin)
+	g.GET("/logout", a.handlerLogout)
+	g.GET("/update-last-usage-time", a.handlerUpdateLastUsageTime)
 }
 
-func (a apiLogin) loginHandler(ctx *gin.Context) {
+func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
+	basiclogin.New(loginGroup, func(ctx *gin.Context, username, password string, secure bool) {
+		cookie, err := user.Login(username, password, secure)
+		if err != nil {
+			// 失败
+			ctx.String(401, err.Error())
+			ctx.Error(err)
+			return
+		}
+		// 成功
+		ctx.Writer.Header().Add("Set-Cookie", cookie.String())
+		ctx.Header("Referrer-Policy", "no-referrer")
+		scriptRedirect(ctx, 401, conf.Http.Old_PathPrefix)
+	})
+}
+
+func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	// 退出登录，如果有效
 	mysession.LogOutSessionForRequest(ctx.Request)
 
@@ -65,7 +81,7 @@ func (a apiLogin) loginHandler(ctx *gin.Context) {
 	ctx.Status(200)
 }
 
-func (a apiLogin) logoutHandler(ctx *gin.Context) {
+func (a apiLogin) handlerLogout(ctx *gin.Context) {
 	// 退出登录
 	cookie, ok := mysession.LogOutSessionForRequest(ctx.Request)
 	if ok {
@@ -76,18 +92,10 @@ func (a apiLogin) logoutHandler(ctx *gin.Context) {
 	ctx.Redirect(303, conf.Http.Old_PathPrefix+"login/")
 }
 
-func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
-	basiclogin.New(loginGroup, func(ctx *gin.Context, username, password string, secure bool) {
-		cookie, err := user.Login(username, password, secure)
-		if err != nil {
-			// 失败
-			ctx.String(401, err.Error())
-			ctx.Error(err)
-			return
-		}
-		// 成功
-		ctx.Writer.Header().Add("Set-Cookie", cookie.String())
-		ctx.Header("Referrer-Policy", "no-referrer")
-		scriptRedirect(ctx, 401, conf.Http.Old_PathPrefix)
-	})
+func (a apiLogin) handlerUpdateLastUsageTime(ctx *gin.Context) {
+	if mysession.CheckLoggedInCookieForCtx(ctx) {
+		ctx.Status(200)
+		return
+	}
+	ctx.Status(401)
 }
