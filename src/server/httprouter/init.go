@@ -11,6 +11,7 @@ import (
 	"github.com/bddjr/BCSPanel/src/server/mylog"
 	"github.com/bddjr/BCSPanel/src/server/mysession"
 	"github.com/bddjr/basiclogin-gin"
+	"github.com/bddjr/hlfhr"
 	"github.com/gin-gonic/gin"
 	"github.com/nanmu42/gzip"
 )
@@ -136,18 +137,19 @@ func GetHandler() http.Handler {
 	})
 	for _, name := range []string{"assets", "icon"} {
 		g := mainGroup.Group(name)
-		g.Use(handlerCheckNotLoggedIn401)
+		g.Use(handlerRemoveQuery, handlerCheckNotLoggedIn401)
 		g.Static("/", dist+name)
 	}
 
 	// login
 	loginGroup := mainGroup.Group("login")
+	loginGroup.Use(handlerRemoveQuery)
 	if conf.Http.Old_EnableBasicLogin {
 		// 使用basic登录页面
-		loginGroup.Use(handlerRemoveQuery, func(ctx *gin.Context) {
+		loginGroup.Use(func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录
-				ctx.Redirect(303, conf.Http.Old_PathPrefix)
+				redirect(ctx, 303, conf.Http.Old_PathPrefix)
 				ctx.Abort()
 				return
 			}
@@ -156,7 +158,7 @@ func GetHandler() http.Handler {
 	} else {
 		// 使用完整登录页面
 		const dist = "./src/web-login/dist/"
-		loginGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
+		loginGroup.GET("/", func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存
 				scriptRedirect(ctx, 401, "../")
@@ -208,9 +210,13 @@ func handlerCheckNotLoggedIn401(ctx *gin.Context) {
 func handlerRemoveQuery(ctx *gin.Context) {
 	if ctx.Request.URL.RawQuery != "" {
 		// 移除参数
-		ctx.Redirect(301, ctx.Request.URL.Path)
+		redirect(ctx, 301, ctx.Request.URL.Path)
 		ctx.Abort()
 	}
+}
+
+func redirect(ctx *gin.Context, code int, path string) {
+	hlfhr.Redirect(ctx.Writer, code, path)
 }
 
 func scriptRedirect(ctx *gin.Context, code int, path string) {

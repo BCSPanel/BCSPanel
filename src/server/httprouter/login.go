@@ -94,7 +94,7 @@ func (a apiLogin) handlerLogout(ctx *gin.Context) {
 		ctx.SetCookie(mysession.SessionCookieName, "x", -1, "", "", false, true)
 	}
 	// 重定向
-	ctx.Redirect(303, conf.Http.Old_PathPrefix+"login/")
+	redirect(ctx, 303, conf.Http.Old_PathPrefix+"login/")
 }
 
 func (a apiLogin) handlerUpdateLastUsageTime(ctx *gin.Context) {
