@@ -25,7 +25,7 @@ func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
 		if a.loginSetCookie(ctx, cookie, err) {
 			// 成功
 			ctx.Header("Referrer-Policy", "no-referrer")
-			scriptRedirect(ctx, 401, conf.Http.Old_PathPrefix)
+			redirect(ctx, 401, conf.Http.Old_PathPrefix)
 		}
 	})
 }

@@ -129,7 +129,7 @@ func GetHandler() http.Handler {
 	mainGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
 			// 未登录，脚本重定向，防止客户端丢失缓存
-			scriptRedirect(ctx, 401, "./login/")
+			redirect(ctx, 401, "./login/")
 			return
 		}
 		// 网页
@@ -161,7 +161,7 @@ func GetHandler() http.Handler {
 		loginGroup.GET("/", func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存
-				scriptRedirect(ctx, 401, "../")
+				redirect(ctx, 401, "../")
 				return
 			}
 			// 网页
@@ -216,11 +216,11 @@ func handlerRemoveQuery(ctx *gin.Context) {
 }
 
 func redirect(ctx *gin.Context, code int, path string) {
-	hlfhr.Redirect(ctx.Writer, code, path)
-}
-
-func scriptRedirect(ctx *gin.Context, code int, path string) {
-	basiclogin.ScriptRedirect(ctx, code, path)
+	if code/100 == 3 {
+		hlfhr.Redirect(ctx.Writer, code, path)
+	} else {
+		basiclogin.ScriptRedirect(ctx, code, path)
+	}
 }
 
 func getClientIP(ctx *gin.Context) string {
