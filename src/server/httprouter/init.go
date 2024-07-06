@@ -2,8 +2,8 @@ package httprouter
 
 import (
 	"crypto/hmac"
-	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -24,21 +24,26 @@ func apiInit(apiGroup *gin.RouterGroup) {
 	apiUsers{}.Init(apiGroup.Group("users"))
 }
 
-func GetRouter() *gin.Engine {
+func GetHandler() http.Handler {
 	// 设置配置文件
 	conf.Http.Old_PathPrefix = conf.Http.New_PathPrefix
 	conf.Http.Old_GzipLevel = conf.Http.New_GzipLevel
 	conf.Http.Old_GzipMinContentLength = conf.Http.New_GzipMinContentLength
 	conf.Http.Old_EnableBasicLogin = conf.Http.New_EnableBasicLogin
+	conf.Http.Old_EnableH2c = conf.Http.New_EnableH2c
 
 	// 创建新的路由
 	Router := gin.New()
 	Router.HandleMethodNotAllowed = true
 	Router.RedirectFixedPath = true
+
+	// https://github.com/gin-gonic/gin/pull/1398
+	Router.UseH2C = conf.Http.Old_EnableH2c && !conf.Ssl.Old_EnableSsl
+
 	// 中间件
 	Router.Use(
 		func(ctx *gin.Context) {
-			if conf.Http.Only_EnableGinLog || ctx.Errors.String() != "" {
+			if conf.Http.Only_EnableGinLog {
 				handlerGinLogger(ctx)
 			}
 		},
@@ -46,15 +51,20 @@ func GetRouter() *gin.Engine {
 			wh := ctx.Writer.Header()
 			// 拒绝跨域请求
 			if h := ctx.Request.Header.Get("Origin"); h != "" {
-				needReject := h == "null"
-				if !needReject {
-					origin, err := url.Parse(h)
-					needReject = err != nil || origin.Host != ctx.Request.Host
-				}
-				if needReject {
+				if h == "null" {
 					wh.Del("Allow")
-					ctx.AbortWithError(403, errors.New("cross origin"))
+					ctx.AbortWithError(403, fmt.Errorf("cross origin request from null"))
 					return
+				}
+				origin, err := url.Parse(h)
+				if err != nil {
+					wh.Del("Allow")
+					ctx.AbortWithStatus(400)
+					return
+				}
+				if origin.Host != ctx.Request.Host {
+					wh.Del("Allow")
+					ctx.AbortWithError(403, fmt.Errorf("cross origin request from %s", origin.Host))
 				}
 			}
 			// 增加响应头
@@ -100,6 +110,12 @@ func GetRouter() *gin.Engine {
 
 	// robots.txt
 	Router.StaticFile("/robots.txt", "./src/robots.txt")
+
+	// favicon.ico
+	Router.Any("/favicon.ico", func(ctx *gin.Context) {
+		ctx.Header("Cache-Control", "max-age=86400")
+		ctx.AbortWithStatus(404)
+	})
 
 	// group
 	mainGroup := &Router.RouterGroup
@@ -157,7 +173,7 @@ func GetRouter() *gin.Engine {
 	// api
 	apiInit(mainGroup.Group("api"))
 
-	return Router
+	return Router.Handler()
 }
 
 var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) (v string) {

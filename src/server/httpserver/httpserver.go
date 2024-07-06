@@ -114,15 +114,12 @@ func ServerHttpListen() {
 	conf.Http.Old_ServerHttpAddr = conf.Http.New_ServerHttpAddr
 	conf.Http.Old_ServerHttpPortNumber = conf.Http.New_ServerHttpPortNumber
 	conf.Ssl.Old_EnableSsl = conf.Ssl.New_EnableSsl
-	conf.Http.Old_EnableH2c = conf.Http.New_EnableH2c
 	conf.Http.Old_KeepAliveSecond = conf.Http.New_KeepAliveSecond
 
 	mylog.INFOf("http ServerHttpListen port %s , ssl %v\n", conf.Http.Old_ServerHttpAddr, conf.Ssl.Old_EnableSsl)
-	router := httprouter.GetRouter()
-	router.UseH2C = conf.Http.Old_EnableH2c && !conf.Ssl.Old_EnableSsl // https://github.com/gin-gonic/gin/pull/1398
 	ServerHttp = hlfhr.New(&http.Server{
 		Addr:              conf.Http.Old_ServerHttpAddr,
-		Handler:           router.Handler(),
+		Handler:           httprouter.GetHandler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	})
 	// 是否保持连接
