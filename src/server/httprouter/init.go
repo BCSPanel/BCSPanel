@@ -17,7 +17,6 @@ import (
 )
 
 func apiInit(apiGroup *gin.RouterGroup) {
-	apiColorScheme{}.Init(apiGroup.Group("color-scheme"))
 	apiFiles{}.Init(apiGroup.Group("files"))
 	apiLogin{}.Init(apiGroup.Group("login"))
 	apiSettings{}.Init(apiGroup.Group("settings"))
