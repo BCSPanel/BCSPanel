@@ -1,7 +1,7 @@
-[submodule "web"]
-path = src/web
-url = https://github.com/BCSPanel/BCSPanel-web
+[submodule "frontend"]
+path = src/frontend
+url = https://github.com/BCSPanel/frontend
 
-[submodule "web-login"]
-path = src/web-login
-url = https://github.com/BCSPanel/BCSPanel-web-login
+[submodule "frontend-login"]
+path = src/frontend-login
+url = https://github.com/BCSPanel/frontend-login

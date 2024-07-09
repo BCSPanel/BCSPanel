@@ -1,8 +1,0 @@
-# BCSPanel config
-
-# 前端颜色主题
-# 类型: string
-# 默认(跟随系统): ""
-# 浅色: "light"
-# 深色: "dark"
-color_scheme: ""

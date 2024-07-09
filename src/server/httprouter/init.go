@@ -123,8 +123,8 @@ func GetHandler() http.Handler {
 		mainGroup = mainGroup.Group(conf.Http.Old_PathPrefix)
 	}
 
-	// web
-	const dist = "./src/web/dist/"
+	// frontend
+	const dist = "./src/frontend/dist/"
 	mainGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
 			// 未登录，脚本重定向，防止客户端丢失缓存
@@ -156,7 +156,7 @@ func GetHandler() http.Handler {
 		apiLogin{}.InitBasic(loginGroup)
 	} else {
 		// 使用完整登录页面
-		const dist = "./src/web-login/dist/"
+		const dist = "./src/frontend-login/dist/"
 		loginGroup.GET("/", func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存
