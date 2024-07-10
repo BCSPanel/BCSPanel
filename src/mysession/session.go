@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/myrand"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/myrand"
 	"github.com/gin-gonic/gin"
 )
 

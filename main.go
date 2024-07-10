@@ -5,16 +5,16 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bddjr/BCSPanel/src/server/cmdclient"
-	"github.com/bddjr/BCSPanel/src/server/cmdserver"
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/httpserver"
-	"github.com/bddjr/BCSPanel/src/server/isservermode"
-	"github.com/bddjr/BCSPanel/src/server/mygc"
-	"github.com/bddjr/BCSPanel/src/server/myinit"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
-	"github.com/bddjr/BCSPanel/src/server/myrand"
-	"github.com/bddjr/BCSPanel/src/server/shutdown"
+	"github.com/bddjr/BCSPanel/src/cmdclient"
+	"github.com/bddjr/BCSPanel/src/cmdserver"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/httpserver"
+	"github.com/bddjr/BCSPanel/src/isservermode"
+	"github.com/bddjr/BCSPanel/src/mygc"
+	"github.com/bddjr/BCSPanel/src/myinit"
+	"github.com/bddjr/BCSPanel/src/mylog"
+	"github.com/bddjr/BCSPanel/src/myrand"
+	"github.com/bddjr/BCSPanel/src/shutdown"
 )
 
 func main() {

@@ -4,7 +4,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/mysession"
+	"github.com/bddjr/BCSPanel/src/mysession"
 )
 
 var RunningGC bool

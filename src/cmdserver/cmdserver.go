@@ -10,15 +10,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/cmdserver/sharecmdlistener"
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/myhmac"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
-	"github.com/bddjr/BCSPanel/src/server/myrand"
-	"github.com/bddjr/BCSPanel/src/server/myversion"
-	"github.com/bddjr/BCSPanel/src/server/reload"
-	"github.com/bddjr/BCSPanel/src/server/shutdown"
-	"github.com/bddjr/BCSPanel/src/server/user"
+	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/myhmac"
+	"github.com/bddjr/BCSPanel/src/mylog"
+	"github.com/bddjr/BCSPanel/src/myrand"
+	"github.com/bddjr/BCSPanel/src/myversion"
+	"github.com/bddjr/BCSPanel/src/reload"
+	"github.com/bddjr/BCSPanel/src/shutdown"
+	"github.com/bddjr/BCSPanel/src/user"
 )
 
 type CommandType struct {

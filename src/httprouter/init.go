@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
-	"github.com/bddjr/BCSPanel/src/server/mysession"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/mylog"
+	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/basiclogin-gin"
 	"github.com/bddjr/hlfhr"
 	"github.com/gin-gonic/gin"
@@ -23,6 +23,8 @@ func apiInit(apiGroup *gin.RouterGroup) {
 	apiTerminals{}.Init(apiGroup.Group("terminals"))
 	apiUsers{}.Init(apiGroup.Group("users"))
 }
+
+// var regexpUserAgentBot = regexp.MustCompile(`[bB][oO][tT]`)
 
 func GetHandler() http.Handler {
 	// 设置配置文件
@@ -101,19 +103,19 @@ func GetHandler() http.Handler {
 	}
 
 	// 404
+	const frontendDist = "frontend/dist/"
 	Router.NoRoute(func(ctx *gin.Context) {
-		f, err := os.ReadFile("./src/404.html")
+		f, err := os.ReadFile(frontendDist + "404.html")
 		if err == nil {
 			ctx.Data(404, gin.MIMEHTML, f)
 		}
 	})
 
 	// robots.txt
-	Router.StaticFile("/robots.txt", "./src/robots.txt")
+	Router.StaticFile("/robots.txt", frontendDist+"robots.txt")
 
 	// favicon.ico
 	Router.Any("/favicon.ico", func(ctx *gin.Context) {
-		ctx.Header("Cache-Control", "max-age=86400")
 		ctx.AbortWithStatus(404)
 	})
 
@@ -124,7 +126,6 @@ func GetHandler() http.Handler {
 	}
 
 	// frontend
-	const dist = "./src/frontend/dist/"
 	mainGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
 			// 未登录，脚本重定向，防止客户端丢失缓存
@@ -132,12 +133,12 @@ func GetHandler() http.Handler {
 			return
 		}
 		// 网页
-		ctx.File(dist + "index.html")
+		ctx.File(frontendDist + "index.html")
 	})
 	for _, name := range []string{"assets", "icon"} {
 		g := mainGroup.Group(name)
 		g.Use(handlerRemoveQuery, handlerCheckNotLoggedIn401)
-		g.Static("/", dist+name)
+		g.Static("/", frontendDist+name)
 	}
 
 	// login
@@ -156,7 +157,7 @@ func GetHandler() http.Handler {
 		apiLogin{}.InitBasic(loginGroup)
 	} else {
 		// 使用完整登录页面
-		const dist = "./src/frontend-login/dist/"
+		const dist = "frontend-login/dist/"
 		loginGroup.GET("/", func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存

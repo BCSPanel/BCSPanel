@@ -4,8 +4,8 @@ import (
 	"net"
 	"sync"
 
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/mylog"
 )
 
 var Listener *net.Listener = nil

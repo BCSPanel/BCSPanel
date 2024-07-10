@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/myhmac"
-	"github.com/bddjr/BCSPanel/src/server/myrand"
+	"github.com/bddjr/BCSPanel/src/myhmac"
+	"github.com/bddjr/BCSPanel/src/myrand"
 )
 
 const TimeFormat = "2006-01-02 15:04:05 -07:00 MST"

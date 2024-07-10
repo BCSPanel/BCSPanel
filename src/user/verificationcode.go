@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/myrand"
+	"github.com/bddjr/BCSPanel/src/myrand"
 )
 
 const VerificationCodeTimeout = 10 * time.Minute

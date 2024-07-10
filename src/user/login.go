@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/bddjr/BCSPanel/src/server/myregexp"
-	"github.com/bddjr/BCSPanel/src/server/mysession"
+	"github.com/bddjr/BCSPanel/src/myregexp"
+	"github.com/bddjr/BCSPanel/src/mysession"
 )
 
 func Register(name string, password string, inputVerificationCode string, secure bool) (cookie *http.Cookie, err error) {

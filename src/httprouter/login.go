@@ -3,9 +3,9 @@ package httprouter
 import (
 	"net/http"
 
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/mysession"
-	"github.com/bddjr/BCSPanel/src/server/user"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/mysession"
+	"github.com/bddjr/BCSPanel/src/user"
 	"github.com/bddjr/basiclogin-gin"
 	"github.com/gin-gonic/gin"
 )

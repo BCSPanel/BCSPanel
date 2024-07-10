@@ -1,8 +1,8 @@
 package conf
 
 import (
-	"github.com/bddjr/BCSPanel/src/server/isservermode"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/isservermode"
+	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/spf13/viper"
 )
 

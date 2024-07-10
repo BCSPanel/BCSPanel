@@ -6,10 +6,10 @@ import (
 	"net"
 	"os"
 
-	"github.com/bddjr/BCSPanel/src/server/cmdserver"
-	"github.com/bddjr/BCSPanel/src/server/myhmac"
-	"github.com/bddjr/BCSPanel/src/server/myrand"
-	"github.com/bddjr/BCSPanel/src/server/myversion"
+	"github.com/bddjr/BCSPanel/src/cmdserver"
+	"github.com/bddjr/BCSPanel/src/myhmac"
+	"github.com/bddjr/BCSPanel/src/myrand"
+	"github.com/bddjr/BCSPanel/src/myversion"
 )
 
 func Run() {

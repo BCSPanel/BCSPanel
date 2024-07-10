@@ -4,9 +4,9 @@ import (
 	"os"
 	"sync"
 
-	"github.com/bddjr/BCSPanel/src/server/cmdserver/sharecmdlistener"
-	"github.com/bddjr/BCSPanel/src/server/httpserver"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
+	"github.com/bddjr/BCSPanel/src/httpserver"
+	"github.com/bddjr/BCSPanel/src/mylog"
 )
 
 var Shutingdown bool

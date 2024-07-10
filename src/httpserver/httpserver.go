@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/httprouter"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/httprouter"
+	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/hlfhr"
 )
 

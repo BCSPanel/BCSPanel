@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/spf13/viper"
 )
 

@@ -1,13 +1,13 @@
 package reload
 
 import (
-	"github.com/bddjr/BCSPanel/src/server/cmdserver/sharecmdlistener"
-	"github.com/bddjr/BCSPanel/src/server/conf"
-	"github.com/bddjr/BCSPanel/src/server/httpserver"
-	"github.com/bddjr/BCSPanel/src/server/mygc"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
-	"github.com/bddjr/BCSPanel/src/server/mysession"
-	"github.com/bddjr/BCSPanel/src/server/user"
+	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
+	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/httpserver"
+	"github.com/bddjr/BCSPanel/src/mygc"
+	"github.com/bddjr/BCSPanel/src/mylog"
+	"github.com/bddjr/BCSPanel/src/mysession"
+	"github.com/bddjr/BCSPanel/src/user"
 )
 
 var Reloading bool

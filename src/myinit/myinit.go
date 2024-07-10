@@ -1,8 +1,8 @@
 package myinit
 
 import (
-	"github.com/bddjr/BCSPanel/src/server/mygc"
-	"github.com/bddjr/BCSPanel/src/server/mylog"
+	"github.com/bddjr/BCSPanel/src/mygc"
+	"github.com/bddjr/BCSPanel/src/mylog"
 )
 
 // 手动调用所有Init
