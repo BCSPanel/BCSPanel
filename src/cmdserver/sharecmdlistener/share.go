@@ -2,7 +2,6 @@ package sharecmdlistener
 
 import (
 	"net"
-	"sync"
 
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/mylog"
@@ -28,13 +27,8 @@ func Reload() {
 	}
 }
 
-func Close(inwg *sync.WaitGroup) {
+func Close() {
 	Reloading = false
-	defer func() {
-		if inwg != nil {
-			inwg.Done()
-		}
-	}()
 	mylog.INFOln("cmdserver Close")
 
 	close()

@@ -1,12 +1,10 @@
 package httpserver
 
 import (
-	"context"
 	"crypto/tls"
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/bddjr/BCSPanel/src/conf"
@@ -57,11 +55,10 @@ func Reload() {
 		if !conf.Ssl.New_EnableSsl ||
 			!conf.Ssl.Only_EnableListen80Redirect ||
 			conf.Http.New_ServerHttpPortNumber != 443 {
-			ShundownServer80(nil)
+			CloseServer80()
 		} else if conf.Http.Old_Server80Addr != conf.Http.New_Server80Addr {
 			// 监听端口变了
-			ShundownServer80(nil)
-			time.Sleep(1 * time.Second)
+			CloseServer80()
 			go Server80Listen()
 		}
 	} else if conf.Ssl.Only_EnableListen80Redirect {
@@ -87,9 +84,7 @@ func Reload() {
 		// 那么
 		// 重启 ServerHttp
 		mylog.INFOln("http Reload ServerHttp")
-		ShundownServerHttp(nil)
-		// 等1秒再启动
-		time.Sleep(1 * time.Second)
+		CloseServerHttp()
 		go ServerHttpListen()
 		return
 	}
@@ -182,68 +177,6 @@ func Server80Listen() {
 	mylog.ERRORln(err)
 	Server80 = nil
 	Server80Listening = false
-}
-
-// 正常停止所有服务
-func ShutdownServerAll(inwg *sync.WaitGroup) {
-	defer func() {
-		if inwg != nil {
-			inwg.Done()
-		}
-	}()
-	mylog.INFOln("http ShutdownServerAll")
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go ShundownServer80(&wg)
-	wg.Add(1)
-	go ShundownServerHttp(&wg)
-	wg.Wait()
-}
-
-// 正常停止80端口重定向http服务，包括tcp监听
-func ShundownServer80(wg *sync.WaitGroup) {
-	defer func() {
-		if wg != nil {
-			wg.Done()
-		}
-	}()
-	if !Server80Listening {
-		return
-	}
-	mylog.INFOln("http ShundownServer80 , timeout 1s")
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
-	defer cancel()
-	err := Server80.Shutdown(ctx)
-	if err != nil {
-		mylog.ERRORln(err)
-		CloseServer80()
-		return
-	}
-	Server80 = nil
-	Server80Listening = false
-}
-
-// 正常停止http服务，不包括tcp监听
-func ShundownServerHttp(wg *sync.WaitGroup) {
-	defer func() {
-		if wg != nil {
-			wg.Done()
-		}
-	}()
-	if !ServerHttpListening {
-		return
-	}
-	mylog.INFOln("http ShundownServerHttp , timeout 10s")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	err := ServerHttp.Shutdown(ctx)
-	if err != nil {
-		mylog.ERRORln(err)
-		CloseServerHttp()
-		return
-	}
-	ServerHttp = nil
-	ServerHttpListening = false
 }
 
 // 强制停止所有服务

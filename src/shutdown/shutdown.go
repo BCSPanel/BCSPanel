@@ -2,7 +2,6 @@ package shutdown
 
 import (
 	"os"
-	"sync"
 
 	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
 	"github.com/bddjr/BCSPanel/src/httpserver"
@@ -22,10 +21,6 @@ func Shutdown(code int) {
 
 	mylog.INFOln("Shutdown")
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go httpserver.ShutdownServerAll(&wg)
-	wg.Wait()
-
-	sharecmdlistener.Close(nil)
+	httpserver.CloseServerAll()
+	sharecmdlistener.Close()
 }
