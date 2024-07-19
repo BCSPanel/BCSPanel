@@ -178,9 +178,9 @@ func GetHandler() http.Handler {
 	return Router.Handler()
 }
 
-var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) (v string) {
+var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 	mylog.UpdateWriter()
-	v = fmt.Sprint(
+	v := fmt.Sprint(
 		// 时间
 		param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
 		// 客户端IP
@@ -198,7 +198,7 @@ var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams
 	} else {
 		v += "\n"
 	}
-	return
+	return v
 })
 
 func handlerCheckNotLoggedIn401(ctx *gin.Context) {

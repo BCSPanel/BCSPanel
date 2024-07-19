@@ -11,7 +11,7 @@ type ConfigCmdportType struct {
 	NewPort uint16
 }
 
-var Cmdport = &ConfigCmdportType{}
+var Cmdport ConfigCmdportType
 
 func (c *ConfigCmdportType) UpdateConfig_cmdport() {
 	readingLock.Lock()

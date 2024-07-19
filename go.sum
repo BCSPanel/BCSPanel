@@ -1,7 +1,9 @@
 github.com/bddjr/basiclogin-gin v0.0.7 h1:KGeofLYH0fZA9OGoqEhOIGy7zaI15F+V6Q8Rp3wVj68=
 github.com/bddjr/basiclogin-gin v0.0.7/go.mod h1:tVYZaA674r1fwFQ/w8chZYCkNxKFBmBLzmCvc5CEemM=
-github.com/bddjr/hlfhr v0.2.1 h1:M+eEd7iG2cFkpgVdabLbSmeIEu/99Yt5NcVfLQYOCbA=
-github.com/bddjr/hlfhr v0.2.1/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
+github.com/bddjr/hlfhr v0.2.2 h1:rroEpjzScXKFFBmpiEJFfX86T/YszFCtn0ELxCQidvE=
+github.com/bddjr/hlfhr v0.2.2/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
+github.com/bddjr/nametocert-go v0.0.3 h1:8SeJnS0l6Fswk2/8sQrKIz0XMrpfTtb9I43yGuJ8fxs=
+github.com/bddjr/nametocert-go v0.0.3/go.mod h1:XtQUvcJy3r2wKMkCAbLpBmGOnwYFJMAD854fs76M+ME=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=

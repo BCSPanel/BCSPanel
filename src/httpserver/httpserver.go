@@ -81,7 +81,9 @@ func Reload() {
 		// 更改了路径开头
 		conf.Http.Old_PathPrefix != conf.Http.New_PathPrefix ||
 		// 改变了Basic登录的开启状态
-		conf.Http.Old_EnableBasicLogin != conf.Http.New_EnableBasicLogin {
+		conf.Http.Old_EnableBasicLogin != conf.Http.New_EnableBasicLogin ||
+		// 改变了未知名称拒绝握手的开启状态
+		conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName != conf.Ssl.New_EnableRejectHandshakeIfUnrecognizedName {
 		// 那么
 		// 重启 ServerHttp
 		mylog.INFOln("http Reload ServerHttp")
@@ -115,6 +117,7 @@ func ServerHttpListen() {
 	conf.Http.Old_ServerHttpPortNumber = conf.Http.New_ServerHttpPortNumber
 	conf.Ssl.Old_EnableSsl = conf.Ssl.New_EnableSsl
 	conf.Http.Old_KeepAliveSecond = conf.Http.New_KeepAliveSecond
+	conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName = conf.Ssl.New_EnableRejectHandshakeIfUnrecognizedName
 
 	mylog.INFOf("http ServerHttpListen port %s , ssl %v\n", conf.Http.Old_ServerHttpAddr, conf.Ssl.Old_EnableSsl)
 	ServerHttp = hlfhr.New(&http.Server{
@@ -141,8 +144,9 @@ func ServerHttpListen() {
 			// 禁用h2
 			ServerHttp.TLSNextProto = map[string]func(*http.Server, *tls.Conn, http.Handler){}
 		}
+		conf.Ssl.CertsProc.RejectHandshakeIfUnrecognizedName = conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName
 		ServerHttp.TLSConfig = &tls.Config{
-			GetCertificate: conf.Ssl.GetNameToCert,
+			GetCertificate: conf.Ssl.CertsProc.GetCertificate,
 		}
 		err = ServerHttp.ListenAndServeTLS("", "")
 	}

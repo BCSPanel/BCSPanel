@@ -2,28 +2,29 @@ package conf
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"fmt"
 	"path"
-	"strings"
 
 	"github.com/bddjr/BCSPanel/src/mylog"
+	"github.com/bddjr/nametocert-go"
 	"github.com/spf13/viper"
 )
 
 type ConfigSslCertsType map[string]*tls.Certificate
 
 type ConfigSslType struct {
-	NameToCerts ConfigSslCertsType
+	CertsProc nametocert.Processor
 
 	Old_EnableSsl bool
 	New_EnableSsl bool
 
 	Only_EnableListen80Redirect bool
 	Only_EnableHttp2            bool
+
+	Old_EnableRejectHandshakeIfUnrecognizedName bool
+	New_EnableRejectHandshakeIfUnrecognizedName bool
 }
 
-var Ssl = &ConfigSslType{}
+var Ssl ConfigSslType
 
 func (c *ConfigSslType) UpdateConfig_ssl() {
 	readingLock.Lock()
@@ -59,22 +60,12 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 		c.Only_EnableHttp2 = true
 	}
 
-	// 新证书表
-	newCerts := ConfigSslCertsType{}
-	defer func() {
-		c.NameToCerts = newCerts
-	}()
+	// 如果找不到与名称匹配的证书，拒绝握手。
+	c.New_EnableRejectHandshakeIfUnrecognizedName, _ = viper.Get("enable_reject_handshake_if_unrecognized_name").(bool)
 
-	// 读默认证书
-	cert, err := tls.LoadX509KeyPair(
-		"./src/server/httpserver/cert/localhost.crt",
-		"./src/server/httpserver/cert/localhost.key",
-	)
-	if err != nil {
-		mylog.ERRORln("Can not read default cert")
-	} else {
-		newCerts["*"] = &cert
-	}
+	// 新证书表
+	certs := nametocert.Certs{}
+	defer c.CertsProc.SetCerts(certs)
 
 	// 证书合集
 	ymlCerts, ok := viper.Get("certs").([]interface{})
@@ -93,42 +84,6 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 			mylog.ERRORf("Can not read cert \"%s\" , %v\n", certName, err)
 			continue
 		}
-		// 解析证书
-		Certificate, err := x509.ParseCertificate(cert.Certificate[0])
-		if err != nil {
-			mylog.ERRORf("Can not parse cert \"%s\" , %v\n", certName, err)
-			continue
-		}
-		// 依据证书里的可选名称，自动匹配
-		names := Certificate.DNSNames
-		for k := 0; k < len(names); k++ {
-			name := names[k]
-			newCerts[name] = &cert
-		}
-		// 如果证书有可选IP，那么当servername为空的时候匹配
-		if len(Certificate.IPAddresses) > 0 {
-			newCerts[""] = &cert
-		}
+		certs.Add(&cert)
 	}
-}
-
-func (c *ConfigSslType) GetNameToCert(ClientHelloInfo *tls.ClientHelloInfo) (cert *tls.Certificate, err error) {
-	// www.example.com
-	cert, ok := c.NameToCerts[ClientHelloInfo.ServerName]
-	if ok {
-		return
-	}
-	// *.example.com
-	if i := strings.IndexByte(ClientHelloInfo.ServerName, '.'); i != -1 {
-		cert, ok = c.NameToCerts["*"+ClientHelloInfo.ServerName[i:]]
-		if ok {
-			return
-		}
-	}
-	// default
-	cert, ok = c.NameToCerts["*"]
-	if !ok {
-		err = fmt.Errorf(`can not find cert for "%s"`, ClientHelloInfo.ServerName)
-	}
-	return
 }

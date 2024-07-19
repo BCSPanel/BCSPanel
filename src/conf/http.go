@@ -52,7 +52,7 @@ type ConfigHttpType struct {
 	New_EnableH2c bool
 }
 
-var Http = &ConfigHttpType{}
+var Http ConfigHttpType
 
 func (c *ConfigHttpType) UpdateConfig_http() {
 	readingLock.Lock()
