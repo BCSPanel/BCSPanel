@@ -12,7 +12,7 @@ import (
 type ConfigSslCertsType map[string]*tls.Certificate
 
 type ConfigSslType struct {
-	CertsProc nametocert.Processor
+	Certs nametocert.Certs
 
 	Old_EnableSsl bool
 	New_EnableSsl bool
@@ -64,8 +64,8 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 	c.New_EnableRejectHandshakeIfUnrecognizedName, _ = viper.Get("enable_reject_handshake_if_unrecognized_name").(bool)
 
 	// 新证书表
-	certs := nametocert.Certs{}
-	defer c.CertsProc.SetCerts(certs)
+	c.Certs.Clear()
+	defer c.Certs.CompleteUpdate()
 
 	// 证书合集
 	ymlCerts, ok := viper.Get("certs").([]interface{})
@@ -84,6 +84,6 @@ func (c *ConfigSslType) UpdateConfig_ssl() {
 			mylog.ERRORf("Can not read cert \"%s\" , %v\n", certName, err)
 			continue
 		}
-		certs.Add(&cert)
+		c.Certs.Add(&cert)
 	}
 }

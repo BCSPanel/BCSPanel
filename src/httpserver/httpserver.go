@@ -139,9 +139,13 @@ func ServerHttpListen() {
 			// 禁用h2
 			ServerHttp.TLSNextProto = map[string]func(*http.Server, *tls.Conn, http.Handler){}
 		}
-		conf.Ssl.CertsProc.RejectHandshakeIfUnrecognizedName = conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName
 		ServerHttp.TLSConfig = &tls.Config{
-			GetCertificate: conf.Ssl.CertsProc.GetCertificate,
+			Certificates: nil,
+		}
+		if conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName {
+			ServerHttp.TLSConfig.GetCertificate = conf.Ssl.Certs.GetCert_DefaultReject
+		} else {
+			ServerHttp.TLSConfig.GetCertificate = conf.Ssl.Certs.GetCert_DefaultCert
 		}
 		err = ServerHttp.ListenAndServeTLS("", "")
 	}
