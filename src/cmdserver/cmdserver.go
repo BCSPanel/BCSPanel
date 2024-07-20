@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"fmt"
 	"io"
+	"io/fs"
 	"net"
 	"os"
 	"strings"
@@ -30,6 +31,7 @@ var keyForClient [64]byte
 var listener net.Listener = nil
 
 const ListenIP = "127.209.156.239"
+const cacheFileMode = fs.FileMode(0600)
 
 func Start() {
 	go start()
@@ -44,18 +46,18 @@ func start() {
 	myrand.Read(keyForClient[:])
 	myrand.Read(keyForServer[:])
 	// 写入文件
-	os.Mkdir("cache", 0777)
-	err := os.WriteFile("cache/cmd-client-key", keyForClient[:], 0777)
+	os.Mkdir("cache", cacheFileMode)
+	err := os.WriteFile("cache/cmd-client-key", keyForClient[:], cacheFileMode)
 	if err != nil {
 		mylog.ERRORln("cmdport write file error:", err)
 		return
 	}
-	err = os.WriteFile("cache/cmd-server-key", keyForServer[:], 0777)
+	err = os.WriteFile("cache/cmd-server-key", keyForServer[:], cacheFileMode)
 	if err != nil {
 		mylog.ERRORln("cmdport write file error:", err)
 		return
 	}
-	err = os.WriteFile("cache/cmd-port", []byte(fmt.Sprint(conf.Cmdport.OldPort)), 0777)
+	err = os.WriteFile("cache/cmd-port", []byte(fmt.Sprint(conf.Cmdport.OldPort)), cacheFileMode)
 	if err != nil {
 		mylog.ERRORln("cmdport write file error:", err)
 		return

@@ -4,6 +4,7 @@ import (
 	"crypto/hmac"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"os"
 	"strconv"
 	"strings"
@@ -20,6 +21,7 @@ const DataUsersDirPath = "data/users"
 const NameToIdDirPath = DataUsersDirPath + "/#name-to-id"
 const PathPrefixForUserNameToId = NameToIdDirPath + "/@"
 const NextIdPath = DataUsersDirPath + "/#next-id"
+const userFileMode = fs.FileMode(0600)
 
 const UserCacheTimeout = 1 * time.Hour
 
@@ -93,8 +95,8 @@ func writeUserNameToId(name string, id int) error {
 		return fmt.Errorf("writeUserNameToId: incorrect username format")
 	}
 	name = strings.ToLower(name)
-	os.MkdirAll(NameToIdDirPath, 0777)
-	return os.WriteFile(PathPrefixForUserNameToId+name, []byte(strconv.Itoa(id)), 0777)
+	os.MkdirAll(NameToIdDirPath, userFileMode)
+	return os.WriteFile(PathPrefixForUserNameToId+name, []byte(strconv.Itoa(id)), userFileMode)
 }
 
 func WriteUserNameToId(name string, id int) error {
@@ -177,9 +179,9 @@ func (user *UserV1) writeUser() error {
 	if err != nil {
 		return err
 	}
-	os.MkdirAll(DataUsersDirPath, 0777)
+	os.MkdirAll(DataUsersDirPath, userFileMode)
 	filename := fmt.Sprint(DataUsersDirPath, "/", user.Id, ".json")
-	err = os.WriteFile(filename, userjson, 0777)
+	err = os.WriteFile(filename, userjson, userFileMode)
 	if err != nil {
 		return err
 	}
@@ -206,7 +208,7 @@ func createAndWriteUser(name string, password string) (user *UserV1, err error) 
 	if _, err := os.Stat(PathPrefixForUserNameToId + name); err == nil {
 		return nil, fmt.Errorf("the_username_already_exists")
 	}
-	os.MkdirAll(DataUsersDirPath, 0777)
+	os.MkdirAll(DataUsersDirPath, userFileMode)
 	var id int
 	fb, err := os.ReadFile(NextIdPath)
 	if err != nil {
@@ -240,7 +242,7 @@ func createAndWriteUser(name string, password string) (user *UserV1, err error) 
 	if err != nil {
 		return
 	}
-	os.WriteFile(NextIdPath, []byte(strconv.Itoa(id+1)), 0777)
+	os.WriteFile(NextIdPath, []byte(strconv.Itoa(id+1)), userFileMode)
 	err = writeUserNameToId(user.Name, id)
 	return
 }

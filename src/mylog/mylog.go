@@ -5,6 +5,7 @@ package mylog
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"os"
 	"sync"
@@ -21,6 +22,8 @@ var logTY int
 var logTM time.Month
 var logTD int
 
+const logFileMode = fs.FileMode(0644)
+
 // 故意的
 func init() {
 	gin.SetMode(gin.ReleaseMode)
@@ -30,7 +33,7 @@ func Init() {
 	fmt.Println("Start BCSPanel mylog")
 	gin.DisableConsoleColor()
 
-	os.Mkdir("log", 0777)
+	os.Mkdir("log", logFileMode)
 	err := UpdateWriter()
 	if err != nil {
 		panic(fmt.Errorf("mylog error update writer: %v", err))
@@ -56,7 +59,7 @@ func UpdateWriter() (err error) {
 	}
 	logTY, logTM, logTD = y, m, d
 	CloseFile()
-	logFile, err = os.OpenFile(fmt.Sprintf("log/%s.txt", timeNow.Format("2006-01-02")), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	logFile, err = os.OpenFile(fmt.Sprintf("log/%s.txt", timeNow.Format("2006-01-02")), os.O_RDWR|os.O_CREATE|os.O_APPEND, logFileMode)
 	if err != nil {
 		return
 	}

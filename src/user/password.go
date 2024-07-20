@@ -2,8 +2,11 @@ package user
 
 import (
 	"fmt"
+	"io/fs"
 	"os"
 )
+
+const passwordFileMode = fs.FileMode(0600)
 
 type PasswordV1 struct {
 	Password [64]byte
@@ -49,7 +52,7 @@ func (password *PasswordV1) writeForId(id int) (err error) {
 	copy(b[1:65], password.Password[:])
 	copy(b[65:81], password.Salt[:])
 
-	err = os.WriteFile(fmt.Sprint(DataUsersDirPath, "/", id, ".passwd"), b, 0777)
+	err = os.WriteFile(fmt.Sprint(DataUsersDirPath, "/", id, ".passwd"), b, passwordFileMode)
 	return
 }
 
