@@ -127,8 +127,6 @@ func readJson(c net.Conn) (jsonStr string, err error) {
 }
 
 func handleConn(c net.Conn) {
-	// 关闭连接时必须直接释放连接，而不是TimeWait
-	c.(*net.TCPConn).SetLinger(0)
 	// 函数退出时自动关闭连接
 	defer c.Close()
 

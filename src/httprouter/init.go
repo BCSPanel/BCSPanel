@@ -67,6 +67,7 @@ func GetHandler() http.Handler {
 				if origin.Host != ctx.Request.Host {
 					wh.Del("Allow")
 					ctx.AbortWithError(403, fmt.Errorf("cross origin request from %s", origin.Host))
+					return
 				}
 			}
 			// 增加响应头
