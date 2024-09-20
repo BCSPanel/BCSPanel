@@ -104,21 +104,16 @@ func GetHandler() http.Handler {
 	}
 
 	// 404
-	const frontendDist = "frontend/dist/"
+	const dist = "frontend-antd/dist/"
 	Router.NoRoute(func(ctx *gin.Context) {
-		f, err := os.ReadFile(frontendDist + "404.html")
+		f, err := os.ReadFile(dist + "404.html")
 		if err == nil {
 			ctx.Data(404, gin.MIMEHTML, f)
 		}
 	})
 
 	// robots.txt
-	Router.StaticFile("/robots.txt", frontendDist+"robots.txt")
-
-	// favicon.ico
-	Router.Any("/favicon.ico", func(ctx *gin.Context) {
-		ctx.AbortWithStatus(404)
-	})
+	Router.StaticFile("/robots.txt", dist+"robots.txt")
 
 	// group
 	mainGroup := &Router.RouterGroup
@@ -127,24 +122,35 @@ func GetHandler() http.Handler {
 	}
 
 	// frontend
-	mainGroup.GET("/", handlerRemoveQuery, func(ctx *gin.Context) {
+	mainGroup.GET("/", func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
 			// 未登录，脚本重定向，防止客户端丢失缓存
 			redirect(ctx, 401, "./login/")
 			return
 		}
 		// 网页
-		ctx.File(frontendDist + "index.html")
+		ctx.File(dist + "index.html")
 	})
-	for _, name := range []string{"assets", "icon"} {
-		g := mainGroup.Group(name)
-		g.Use(handlerRemoveQuery, handlerCheckNotLoggedIn401)
-		g.Static("/", frontendDist+name)
+	files, err := os.ReadDir(dist)
+	if err != nil {
+		panic(err)
+	}
+	for _, f := range files {
+		name := f.Name()
+		if name[0] == '[' || name == "index.html" || name == "robots.txt" {
+			continue
+		}
+		if f.IsDir() {
+			g := mainGroup.Group(name)
+			g.Use(handlerCheckNotLoggedIn401)
+			g.Static("/", dist+name)
+			continue
+		}
+		mainGroup.StaticFile(name, dist+name)
 	}
 
 	// login
 	loginGroup := mainGroup.Group("login")
-	loginGroup.Use(handlerRemoveQuery)
 	if conf.Http.Old_EnableBasicLogin {
 		// 使用basic登录页面
 		loginGroup.Use(func(ctx *gin.Context) {
@@ -158,7 +164,7 @@ func GetHandler() http.Handler {
 		apiLogin{}.InitBasic(loginGroup)
 	} else {
 		// 使用完整登录页面
-		const dist = "frontend-login/dist/"
+		const dist = "frontend-login2/dist/"
 		loginGroup.GET("/", func(ctx *gin.Context) {
 			if mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存
@@ -168,8 +174,20 @@ func GetHandler() http.Handler {
 			// 网页
 			ctx.File(dist + "index.html")
 		})
-		for _, name := range []string{"assets", "icon", "config", "ie"} {
-			loginGroup.Static(name, dist+name)
+		files, err := os.ReadDir(dist)
+		if err != nil {
+			panic(err)
+		}
+		for _, f := range files {
+			name := f.Name()
+			if name[0] == '[' || name == "index.html" {
+				continue
+			}
+			if f.IsDir() {
+				loginGroup.Static(name, dist+name)
+				continue
+			}
+			loginGroup.StaticFile(name, dist+name)
 		}
 	}
 

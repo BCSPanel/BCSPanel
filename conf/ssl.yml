@@ -3,7 +3,7 @@
 # 启用 HTTPS 。
 # 类型: bool
 # 默认: false
-enable: true
+enable: false
 
 # 启用 80 端口监听 HTTP ，用于重定向到 HTTPS 端口。
 # 仅 HTTPS 端口是 443 的时候有效。

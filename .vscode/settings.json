@@ -1,5 +1,5 @@
 {
     "gopls": {
-        "ui.semanticTokens": true
+        "ui.semanticTokens": false
     }
 }
