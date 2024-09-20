@@ -16,7 +16,6 @@ import (
 )
 
 const TimeFormat = "2006-01-02 15:04:05 -07:00 MST"
-const MaxPasswordLength = 128
 const DataUsersDirPath = "data/users"
 const NameToIdDirPath = DataUsersDirPath + "/#name-to-id"
 const PathPrefixForUserNameToId = NameToIdDirPath + "/@"

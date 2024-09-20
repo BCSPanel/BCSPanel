@@ -44,7 +44,7 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 		// 密码
 		Password string `json:"password"`
 		// 注册模式发送验证码
-		VerificationCode string `json:"verification_code"`
+		VerifyCode string `json:"verify_code"`
 	}
 
 	// 解析表单
@@ -59,7 +59,7 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	var cookie *http.Cookie
 	if loginJson.Isregister {
 		// 注册
-		cookie, err = user.Register(loginJson.Username, loginJson.Password, loginJson.VerificationCode, loginJson.Secure)
+		cookie, err = user.Register(loginJson.Username, loginJson.Password, loginJson.VerifyCode, loginJson.Secure)
 	} else {
 		// 登录
 		cookie, err = user.Login(loginJson.Username, loginJson.Password, loginJson.Secure)
