@@ -1,5 +1,7 @@
 github.com/bddjr/basiclogin-gin v0.0.7 h1:KGeofLYH0fZA9OGoqEhOIGy7zaI15F+V6Q8Rp3wVj68=
 github.com/bddjr/basiclogin-gin v0.0.7/go.mod h1:tVYZaA674r1fwFQ/w8chZYCkNxKFBmBLzmCvc5CEemM=
+github.com/bddjr/gzipstatic-gin v0.0.2 h1:x6IRFebTEPl6TH2LGVXb6Q5LC+R1sP56J7EzaYPLbeM=
+github.com/bddjr/gzipstatic-gin v0.0.2/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
 github.com/bddjr/hlfhr v0.2.2 h1:rroEpjzScXKFFBmpiEJFfX86T/YszFCtn0ELxCQidvE=
 github.com/bddjr/hlfhr v0.2.2/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
 github.com/bddjr/nametocert-go v0.1.0 h1:dvrJgrtu2Mt0rPQurWHNji5etZPPjHyoihgys1a6T6g=

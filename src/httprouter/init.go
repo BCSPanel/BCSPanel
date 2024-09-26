@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strings"
 
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/basiclogin-gin"
+	"github.com/bddjr/gzipstatic-gin"
 	"github.com/bddjr/hlfhr"
 	"github.com/gin-gonic/gin"
 	"github.com/nanmu42/gzip"
@@ -103,14 +105,20 @@ func GetHandler() http.Handler {
 		}).Gin)
 	}
 
-	// 404
 	const dist = "frontend-antd/dist/"
-	Router.NoRoute(func(ctx *gin.Context) {
-		f, err := os.ReadFile(dist + "404.html")
-		if err == nil {
+
+	// 404
+	noRoute := func(ctx *gin.Context) {
+		if strings.HasPrefix(ctx.GetHeader("Accept"), "text/html") {
+			f, _ := os.ReadFile(dist + "404.html")
 			ctx.Data(404, gin.MIMEHTML, f)
+			return
 		}
-	})
+		ctx.Status(404)
+		ctx.Writer.Write(nil)
+	}
+	Router.NoRoute(noRoute)
+	gzipstatic.NoRoute = noRoute
 
 	// robots.txt
 	Router.StaticFile("/robots.txt", dist+"robots.txt")
@@ -129,7 +137,8 @@ func GetHandler() http.Handler {
 			return
 		}
 		// 网页
-		ctx.File(dist + "index.html")
+		// ctx.File(dist + "index.html")
+		gzipstatic.File(ctx, dist+"index.html")
 	})
 	files, err := os.ReadDir(dist)
 	if err != nil {
@@ -143,10 +152,12 @@ func GetHandler() http.Handler {
 		if f.IsDir() {
 			g := mainGroup.Group(name)
 			g.Use(handlerCheckNotLoggedIn401)
-			g.Static("/", dist+name)
+			// g.Static("/", dist+name)
+			gzipstatic.Static(g, "/", dist+name)
 			continue
 		}
-		mainGroup.StaticFile(name, dist+name)
+		// mainGroup.StaticFile(name, dist+name)
+		gzipstatic.StaticFile(mainGroup, name, dist+name)
 	}
 
 	// login
@@ -172,7 +183,8 @@ func GetHandler() http.Handler {
 				return
 			}
 			// 网页
-			ctx.File(dist + "index.html")
+			// ctx.File(dist + "index.html")
+			gzipstatic.File(ctx, dist+"index.html")
 		})
 		files, err := os.ReadDir(dist)
 		if err != nil {
@@ -184,10 +196,12 @@ func GetHandler() http.Handler {
 				continue
 			}
 			if f.IsDir() {
-				loginGroup.Static(name, dist+name)
+				// loginGroup.Static(name, dist+name)
+				gzipstatic.Static(loginGroup, name, dist+name)
 				continue
 			}
-			loginGroup.StaticFile(name, dist+name)
+			// loginGroup.StaticFile(name, dist+name)
+			gzipstatic.StaticFile(loginGroup, name, dist+name)
 		}
 	}
 
