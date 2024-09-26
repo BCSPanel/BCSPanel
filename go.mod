@@ -10,7 +10,7 @@ require (
 
 require (
 	github.com/bddjr/basiclogin-gin v0.0.7 // indirect
-	github.com/bddjr/gzipstatic-gin v0.0.2 // indirect
+	github.com/bddjr/gzipstatic-gin v0.0.3 // indirect
 	github.com/bddjr/nametocert-go v0.1.0 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
