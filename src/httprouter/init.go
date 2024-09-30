@@ -136,7 +136,7 @@ func GetHandler() http.Handler {
 			return
 		}
 		// 网页
-		// ctx.File(dist + "index.html")
+		// ctx.File(dist)
 		gzipstatic.File(ctx, dist)
 	})
 	files, err := os.ReadDir(dist)
@@ -149,7 +149,7 @@ func GetHandler() http.Handler {
 			continue
 		}
 		switch name {
-		case "index.html", "robots.txt", "login":
+		case "index.html", "robots.txt", "login", "api":
 			continue
 		}
 		if f.IsDir() {
