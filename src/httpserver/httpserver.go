@@ -77,8 +77,6 @@ func Reload() {
 		(!conf.Ssl.New_EnableSsl && conf.Http.Old_EnableH2c != conf.Http.New_EnableH2c) ||
 		// 更改了路径开头
 		conf.Http.Old_PathPrefix != conf.Http.New_PathPrefix ||
-		// 改变了Basic登录的开启状态
-		conf.Http.Old_EnableBasicLogin != conf.Http.New_EnableBasicLogin ||
 		// 改变了未知名称拒绝握手的开启状态
 		conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName != conf.Ssl.New_EnableRejectHandshakeIfUnrecognizedName {
 		// 那么

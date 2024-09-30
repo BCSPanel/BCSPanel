@@ -6,7 +6,6 @@ import (
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/BCSPanel/src/user"
-	"github.com/bddjr/basiclogin-gin"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,18 +15,6 @@ func (a apiLogin) Init(g *gin.RouterGroup) {
 	g.POST("/login", a.handlerLogin)
 	g.GET("/logout", a.handlerLogout)
 	g.GET("/update-last-usage-time", a.handlerUpdateLastUsageTime)
-}
-
-func (a apiLogin) InitBasic(loginGroup *gin.RouterGroup) {
-	// 使用Basic登录
-	basiclogin.New(loginGroup, func(ctx *gin.Context, username, password string, secure bool) {
-		cookie, err := user.Login(username, password, secure)
-		if a.loginSetCookie(ctx, cookie, err) {
-			// 成功
-			ctx.Header("Referrer-Policy", "no-referrer")
-			redirect(ctx, 401, conf.Http.Old_PathPrefix)
-		}
-	})
 }
 
 func (a apiLogin) handlerLogin(ctx *gin.Context) {

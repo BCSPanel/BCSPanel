@@ -39,9 +39,6 @@ type ConfigHttpType struct {
 
 	Only_EnableGinLog bool
 
-	Old_EnableBasicLogin bool
-	New_EnableBasicLogin bool
-
 	Old_KeepAliveSecond int
 	New_KeepAliveSecond int
 
@@ -71,7 +68,6 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 		c.New_GzipMinContentLength = 1024
 		c.New_PathPrefix = "/"
 		c.Only_AddHeaders = nil
-		c.New_EnableBasicLogin = false
 		c.Only_EnableGinLog = true
 		c.New_KeepAliveSecond = 180
 		c.New_EnableH2c = false
@@ -146,9 +142,6 @@ func (c *ConfigHttpType) UpdateConfig_http() {
 	} else {
 		c.Only_AddHeaders = nil
 	}
-
-	// 使用Basic登录
-	c.New_EnableBasicLogin, _ = viper.Get("enable_basic_login").(bool)
 
 	// http服务打印Gin框架的日志
 	c.Only_EnableGinLog, ok = viper.Get("enable_gin_log").(bool)

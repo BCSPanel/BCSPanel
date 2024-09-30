@@ -6,12 +6,12 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/mysession"
-	"github.com/bddjr/basiclogin-gin"
 	"github.com/bddjr/gzipstatic-gin"
 	"github.com/bddjr/hlfhr"
 	"github.com/gin-gonic/gin"
@@ -33,7 +33,6 @@ func GetHandler() http.Handler {
 	conf.Http.Old_PathPrefix = conf.Http.New_PathPrefix
 	conf.Http.Old_GzipLevel = conf.Http.New_GzipLevel
 	conf.Http.Old_GzipMinContentLength = conf.Http.New_GzipMinContentLength
-	conf.Http.Old_EnableBasicLogin = conf.Http.New_EnableBasicLogin
 	conf.Http.Old_EnableH2c = conf.Http.New_EnableH2c
 
 	// 创建新的路由
@@ -138,7 +137,7 @@ func GetHandler() http.Handler {
 		}
 		// 网页
 		// ctx.File(dist + "index.html")
-		gzipstatic.File(ctx, dist+"index.html")
+		gzipstatic.File(ctx, dist)
 	})
 	files, err := os.ReadDir(dist)
 	if err != nil {
@@ -146,12 +145,18 @@ func GetHandler() http.Handler {
 	}
 	for _, f := range files {
 		name := f.Name()
-		if name[0] == '[' || name == "index.html" || name == "robots.txt" {
+		if name[0] == '[' {
+			continue
+		}
+		switch name {
+		case "index.html", "robots.txt", "login":
 			continue
 		}
 		if f.IsDir() {
 			g := mainGroup.Group(name)
-			g.Use(handlerCheckNotLoggedIn401)
+			if name == "assets" {
+				g.Use(handlerCheckNotLoggedIn401)
+			}
 			// g.Static("/", dist+name)
 			gzipstatic.Static(g, "/", dist+name)
 			continue
@@ -161,48 +166,19 @@ func GetHandler() http.Handler {
 	}
 
 	// login
-	loginGroup := mainGroup.Group("login")
-	if conf.Http.Old_EnableBasicLogin {
-		// 使用basic登录页面
-		loginGroup.Use(func(ctx *gin.Context) {
-			if mysession.CheckLoggedInCookieForCtx(ctx) {
-				// 已登录
-				redirect(ctx, 303, conf.Http.Old_PathPrefix)
-				ctx.Abort()
-				return
-			}
-		})
-		apiLogin{}.InitBasic(loginGroup)
-	} else {
-		// 使用完整登录页面
+	{
 		const dist = "frontend-login2/dist/"
-		loginGroup.GET("/", func(ctx *gin.Context) {
-			if mysession.CheckLoggedInCookieForCtx(ctx) {
+		g := mainGroup.Group("login")
+		indexPath := g.BasePath() + "/"
+		g.Use(func(ctx *gin.Context) {
+			if ctx.Request.URL.Path == indexPath && mysession.CheckLoggedInCookieForCtx(ctx) {
 				// 已登录，脚本重定向，防止客户端丢失缓存
 				redirect(ctx, 401, "../")
-				return
+				ctx.Abort()
 			}
-			// 网页
-			// ctx.File(dist + "index.html")
-			gzipstatic.File(ctx, dist+"index.html")
 		})
-		files, err := os.ReadDir(dist)
-		if err != nil {
-			panic(err)
-		}
-		for _, f := range files {
-			name := f.Name()
-			if name[0] == '[' || name == "index.html" {
-				continue
-			}
-			if f.IsDir() {
-				// loginGroup.Static(name, dist+name)
-				gzipstatic.Static(loginGroup, name, dist+name)
-				continue
-			}
-			// loginGroup.StaticFile(name, dist+name)
-			gzipstatic.StaticFile(loginGroup, name, dist+name)
-		}
+		// g.Static("/", dist)
+		gzipstatic.Static(g, "/", dist)
 	}
 
 	// api
@@ -252,7 +228,7 @@ func redirect(ctx *gin.Context, code int, path string) {
 	if code/100 == 3 {
 		hlfhr.Redirect(ctx.Writer, code, path)
 	} else {
-		basiclogin.ScriptRedirect(ctx, code, path)
+		ctx.Data(code, "text/html; charset=utf-8", []byte(`<script>location.replace(`+strconv.Quote(path)+`+location.hash)</script>`))
 	}
 }
 

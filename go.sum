@@ -6,6 +6,8 @@ github.com/bddjr/gzipstatic-gin v0.0.3 h1:m7olF14tKh28C83rT6KLgmDIp/pxKzbGzf6wv/
 github.com/bddjr/gzipstatic-gin v0.0.3/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
 github.com/bddjr/gzipstatic-gin v0.0.4 h1:+uDTfdDeMno23qhvYISaoh9nowmbVcfZ0bLC92G7fbY=
 github.com/bddjr/gzipstatic-gin v0.0.4/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
+github.com/bddjr/gzipstatic-gin v0.0.5 h1:mWrPxWGUHmSONKuRVKapMXSqt8DljyPolL3XkNbi+Is=
+github.com/bddjr/gzipstatic-gin v0.0.5/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
 github.com/bddjr/hlfhr v0.2.2 h1:rroEpjzScXKFFBmpiEJFfX86T/YszFCtn0ELxCQidvE=
 github.com/bddjr/hlfhr v0.2.2/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
 github.com/bddjr/nametocert-go v0.1.0 h1:dvrJgrtu2Mt0rPQurWHNji5etZPPjHyoihgys1a6T6g=
