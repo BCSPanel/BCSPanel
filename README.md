@@ -3,26 +3,25 @@
 ---
 
 ## Clone
+
+Use bash on linux  
+Use git bash on windows
+
 ```
 git clone https://github.com/BCSPanel/BCSPanel
 cd BCSPanel
 
-git submodule update --init --remote
-
-cd frontend-antd
-git checkout main
-npm i
-cd ..
-
-cd frontend-login2
-git checkout master
-npm i
-cd ..
+rm -rf frontend-antd frontend-login2
+./init.sh
 ```
 
 ---
 
 ## Build
+
+Use bash on linux  
+Use git bash on windows
+
 ```
 ./build.sh
 ```
@@ -30,6 +29,10 @@ cd ..
 ---
 
 ## Run
+
+Use bash on linux  
+Use git bash on windows
+
 ```
 ./run.sh
 ```

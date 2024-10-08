@@ -3,14 +3,14 @@ module github.com/bddjr/BCSPanel
 go 1.22.2
 
 require (
+	github.com/bddjr/gzipstatic-gin v0.0.5
 	github.com/bddjr/hlfhr v0.2.2
+	github.com/bddjr/nametocert-go v0.1.0
 	github.com/gin-gonic/gin v1.10.0
 	github.com/spf13/viper v1.19.0
 )
 
 require (
-	github.com/bddjr/gzipstatic-gin v0.0.5 // indirect
-	github.com/bddjr/nametocert-go v0.1.0 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
