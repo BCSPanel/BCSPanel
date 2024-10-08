@@ -1,5 +1,3 @@
 {
-    "gopls": {
-        "ui.semanticTokens": false
-    }
+    "files.eol": "\n"
 }
