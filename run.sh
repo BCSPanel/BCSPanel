@@ -1,3 +1,1 @@
-#!/bin/bash
-
 go build && ./BCSPanel __main__
