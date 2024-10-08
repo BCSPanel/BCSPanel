@@ -6,4 +6,5 @@ cd frontend-login2
 npm run build
 cd ..
 
+echo '> go build'
 go build
