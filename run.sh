@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
 
-go build && ./BCSPanel __main__
+./BCSPanel __main__

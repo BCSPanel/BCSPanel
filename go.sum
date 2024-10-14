@@ -10,6 +10,8 @@ github.com/bddjr/gzipstatic-gin v0.0.5 h1:mWrPxWGUHmSONKuRVKapMXSqt8DljyPolL3XkN
 github.com/bddjr/gzipstatic-gin v0.0.5/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
 github.com/bddjr/hlfhr v0.2.2 h1:rroEpjzScXKFFBmpiEJFfX86T/YszFCtn0ELxCQidvE=
 github.com/bddjr/hlfhr v0.2.2/go.mod h1:1v4nqI5AsBIbl+pDg+nY4sig8tSNqqODT2EwpkhX+7M=
+github.com/bddjr/hlfhr v1.0.0 h1:xQs/0DtMBKMVoojELYbeAZBaCDIqi82D2V9SH0oRWtA=
+github.com/bddjr/hlfhr v1.0.0/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/bddjr/nametocert-go v0.1.0 h1:dvrJgrtu2Mt0rPQurWHNji5etZPPjHyoihgys1a6T6g=
 github.com/bddjr/nametocert-go v0.1.0/go.mod h1:XtQUvcJy3r2wKMkCAbLpBmGOnwYFJMAD854fs76M+ME=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
