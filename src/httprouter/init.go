@@ -4,9 +4,7 @@ import (
 	"crypto/hmac"
 	"fmt"
 	"net/http"
-	"net/url"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/bddjr/BCSPanel/src/conf"
@@ -53,23 +51,22 @@ func GetHandler() http.Handler {
 		func(ctx *gin.Context) {
 			wh := ctx.Writer.Header()
 			// 拒绝跨域请求
-			if h := ctx.Request.Header.Get("Origin"); h != "" {
-				if h == "null" {
-					wh.Del("Allow")
-					ctx.AbortWithError(403, fmt.Errorf("cross origin request from null"))
-					return
-				}
-				origin, err := url.Parse(h)
-				if err != nil {
-					wh.Del("Allow")
-					ctx.AbortWithStatus(400)
-					return
-				}
-				if origin.Host != ctx.Request.Host {
-					wh.Del("Allow")
-					ctx.AbortWithError(403, fmt.Errorf("cross origin request from %s", origin.Host))
-					return
-				}
+			origin := ctx.GetHeader("Origin")
+			if len(origin) > len("https://")+255+len(":65535") {
+				// 请求头内容太长了，不像正常的
+				ctx.AbortWithStatus(431)
+				return
+			}
+			switch origin {
+			case "",
+				"https://" + ctx.Request.Host,
+				"http://" + ctx.Request.Host:
+				// 没跨域
+			default:
+				// 跨域了
+				wh.Del("Allow")
+				ctx.AbortWithError(403, fmt.Errorf("cross origin request from %q", origin))
+				return
 			}
 			// 增加响应头
 			for _, v := range conf.Http.Only_AddHeaders {
@@ -228,7 +225,7 @@ func redirect(ctx *gin.Context, code int, path string) {
 	if code/100 == 3 {
 		hlfhr.Redirect(ctx.Writer, code, path)
 	} else {
-		ctx.Data(code, "text/html; charset=utf-8", []byte(`<script>location.replace(`+strconv.Quote(path)+`+location.hash)</script>`))
+		ctx.Data(code, "text/html; charset=utf-8", fmt.Appendf(nil, `<script>location.replace(%q+location.hash)</script>`, path))
 	}
 }
 
