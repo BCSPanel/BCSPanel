@@ -2,9 +2,7 @@ package httpserver
 
 import (
 	"crypto/tls"
-	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/bddjr/BCSPanel/src/conf"
@@ -22,27 +20,6 @@ var Server80 *http.Server
 var Server80Listening bool
 
 func Start() {
-	// 向屏幕输出调试地址
-	var sb strings.Builder
-	sb.WriteString("\n    http")
-	if conf.Ssl.New_EnableSsl {
-		sb.WriteString("s")
-	}
-	sb.WriteString("://localhost")
-	var httpDefaultPort uint16
-	if conf.Ssl.New_EnableSsl {
-		httpDefaultPort = 443
-	} else {
-		httpDefaultPort = 80
-	}
-	if httpDefaultPort != conf.Http.New_ServerHttpPortNumber {
-		// 端口不是协议标准的
-		sb.WriteString(fmt.Sprint(":", conf.Http.New_ServerHttpPortNumber))
-	}
-	sb.WriteString(conf.Http.New_PathPrefix)
-	sb.WriteString("\n")
-	fmt.Println(sb.String())
-
 	// 启动
 	go ServerHttpListen()
 }
@@ -112,7 +89,12 @@ func ServerHttpListen() {
 	conf.Http.Old_KeepAliveSecond = conf.Http.New_KeepAliveSecond
 	conf.Ssl.Old_EnableRejectHandshakeIfUnrecognizedName = conf.Ssl.New_EnableRejectHandshakeIfUnrecognizedName
 
-	mylog.INFOf("http ServerHttpListen port %s , ssl %v\n", conf.Http.Old_ServerHttpAddr, conf.Ssl.Old_EnableSsl)
+	schemeName := "http"
+	if conf.Ssl.Old_EnableSsl {
+		schemeName += "s"
+	}
+	mylog.INFOf("%v://localhost:%v%v", schemeName, conf.Http.New_ServerHttpPortNumber, conf.Http.New_PathPrefix)
+
 	ServerHttp = hlfhr.New(&http.Server{
 		Addr:              conf.Http.Old_ServerHttpAddr,
 		Handler:           httprouter.GetHandler(),

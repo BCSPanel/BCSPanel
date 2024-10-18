@@ -34,18 +34,32 @@ func (w *writer) updateFile() (ok bool) {
 	}
 	w.y, w.m, w.d = y, m, d
 
-	var err error
 	name := fmt.Sprintf("log/%d-%d-%d.txt", y, m, d)
+	exist := false
+	stat, err := os.Stat(name)
+	if err == nil {
+		if stat.IsDir() {
+			err = os.RemoveAll(name)
+			if err != nil {
+				fmt.Printf("mylog remove dir %v error: %v\n", name, err)
+				return false
+			}
+		}
+		exist = true
+	}
+
 	w.f, err = os.OpenFile(
 		name,
-		os.O_RDWR|os.O_CREATE|os.O_APPEND,
+		os.O_WRONLY|os.O_CREATE,
 		FileMode,
 	)
 	if err != nil {
 		fmt.Printf("mylog open %v error: %v\n", name, err)
 		return false
 	}
-	w.f.Write([]byte{'\n'})
+	if exist {
+		w.f.Write([]byte{'\n'})
+	}
 	return true
 }
 
