@@ -50,7 +50,7 @@ func (w *writer) updateFile() (ok bool) {
 
 	w.f, err = os.OpenFile(
 		name,
-		os.O_WRONLY|os.O_CREATE,
+		os.O_WRONLY|os.O_CREATE|os.O_APPEND,
 		FileMode,
 	)
 	if err != nil {
@@ -65,7 +65,7 @@ func (w *writer) updateFile() (ok bool) {
 
 func (w *writer) Write(b []byte) (int, error) {
 	n, err := os.Stdout.Write(b)
-	if err != nil || !w.updateFile() {
+	if !w.updateFile() {
 		return n, err
 	}
 	return w.f.Write(b)
@@ -73,7 +73,7 @@ func (w *writer) Write(b []byte) (int, error) {
 
 func (w *writer) WriteString(s string) (int, error) {
 	n, err := os.Stdout.WriteString(s)
-	if err != nil || !w.updateFile() {
+	if !w.updateFile() {
 		return n, err
 	}
 	return w.f.WriteString(s)
