@@ -16,6 +16,11 @@ import (
 	"github.com/nanmu42/gzip"
 )
 
+func init() {
+	gin.DefaultWriter = &mylog.Writer
+	gin.SetMode(gin.ReleaseMode)
+}
+
 func apiInit(apiGroup *gin.RouterGroup) {
 	apiFiles{}.Init(apiGroup.Group("files"))
 	apiLogin{}.Init(apiGroup.Group("login"))
@@ -45,7 +50,7 @@ func GetHandler() http.Handler {
 	Router.Use(
 		func(ctx *gin.Context) {
 			if conf.Http.Only_EnableGinLog {
-				handlerGinLogger(ctx)
+				logger(ctx)
 			}
 		},
 		func(ctx *gin.Context) {
@@ -184,8 +189,7 @@ func GetHandler() http.Handler {
 	return Router.Handler()
 }
 
-var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-	mylog.UpdateWriter()
+var logger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
 	v := fmt.Sprint(
 		// 时间
 		param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
@@ -201,9 +205,11 @@ var handlerGinLogger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams
 	// 错误消息
 	if param.ErrorMessage != "" {
 		v += " " + param.ErrorMessage
-	} else {
-		v += "\n"
+		if v[len(v)-1] == '\n' {
+			return v
+		}
 	}
+	v += "\n"
 	return v
 })
 
