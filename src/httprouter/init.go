@@ -17,7 +17,6 @@ import (
 )
 
 func init() {
-	gin.DefaultWriter = &mylog.Writer
 	gin.SetMode(gin.ReleaseMode)
 }
 
@@ -189,28 +188,31 @@ func GetHandler() http.Handler {
 	return Router.Handler()
 }
 
-var logger = gin.LoggerWithFormatter(func(param gin.LogFormatterParams) string {
-	v := fmt.Sprint(
-		// 时间
-		param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
-		// 客户端IP
-		param.ClientIP, " ",
-		// 状态码
-		param.StatusCode, " ",
-		// 请求方法
-		param.Method, " ",
-		// 请求路径
-		param.Path,
-	)
-	// 错误消息
-	if param.ErrorMessage != "" {
-		v += " " + param.ErrorMessage
-		if v[len(v)-1] == '\n' {
-			return v
+var logger = gin.LoggerWithConfig(gin.LoggerConfig{
+	Output: &mylog.Writer,
+	Formatter: func(param gin.LogFormatterParams) string {
+		v := fmt.Sprint(
+			// 时间
+			param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
+			// 客户端IP
+			param.ClientIP, " ",
+			// 状态码
+			param.StatusCode, " ",
+			// 请求方法
+			param.Method, " ",
+			// 请求路径
+			param.Path,
+		)
+		// 错误消息
+		if param.ErrorMessage != "" {
+			v += " " + param.ErrorMessage
+			if v[len(v)-1] == '\n' {
+				return v
+			}
 		}
-	}
-	v += "\n"
-	return v
+		v += "\n"
+		return v
+	},
 })
 
 func handlerCheckNotLoggedIn401(ctx *gin.Context) {
