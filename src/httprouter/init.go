@@ -132,8 +132,8 @@ func GetHandler() http.Handler {
 	// frontend
 	mainGroup.GET("/", func(ctx *gin.Context) {
 		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			// 未登录，脚本重定向，防止客户端丢失缓存
-			redirect(ctx, 401, "./login/")
+			// 未登录
+			redirect(ctx, 303, "./login/")
 			return
 		}
 		// 网页
@@ -173,8 +173,8 @@ func GetHandler() http.Handler {
 		indexPath := g.BasePath() + "/"
 		g.Use(func(ctx *gin.Context) {
 			if ctx.Request.URL.Path == indexPath && mysession.CheckLoggedInCookieForCtx(ctx) {
-				// 已登录，脚本重定向，防止客户端丢失缓存
-				redirect(ctx, 401, "../")
+				// 已登录
+				redirect(ctx, 303, "../")
 				ctx.Abort()
 			}
 		})
@@ -230,11 +230,7 @@ func handlerRemoveQuery(ctx *gin.Context) {
 }
 
 func redirect(ctx *gin.Context, code int, path string) {
-	if code/100 == 3 {
-		hlfhr.Redirect(ctx.Writer, code, path)
-	} else {
-		ctx.Data(code, "text/html; charset=utf-8", fmt.Appendf(nil, `<script>location.replace(%q+location.hash)</script>`, path))
-	}
+	hlfhr.Redirect(ctx.Writer, code, path)
 }
 
 func getClientIP(ctx *gin.Context) string {
