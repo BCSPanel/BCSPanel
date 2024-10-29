@@ -5,7 +5,7 @@ cd frontend-antd
 npm run build
 cd ..
 
-cd frontend-login2
+cd frontend-login
 npm run build
 cd ..
 
