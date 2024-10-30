@@ -1,11 +1,9 @@
 package httprouter
 
 import (
-	"crypto/hmac"
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/mylog"
@@ -18,6 +16,16 @@ import (
 
 func init() {
 	gin.SetMode(gin.ReleaseMode)
+}
+
+func handlerCheckNotLoggedIn401(ctx *gin.Context) {
+	if !mysession.CheckLoggedInCookieForCtx(ctx) {
+		ctx.AbortWithStatus(401)
+	}
+}
+
+func redirect(ctx *gin.Context, code int, path string) {
+	hlfhr.Redirect(ctx.Writer, code, path)
 }
 
 func apiInit(apiGroup *gin.RouterGroup) {
@@ -43,15 +51,37 @@ func GetHandler() http.Handler {
 	Router.RedirectFixedPath = true
 
 	// https://github.com/gin-gonic/gin/pull/1398
-	Router.UseH2C = conf.Http.Old_EnableH2c && !conf.Ssl.Old_EnableSsl
+	Router.UseH2C = true
 
 	// 中间件
 	Router.Use(
-		func(ctx *gin.Context) {
-			if conf.Http.Only_EnableGinLog {
-				logger(ctx)
-			}
-		},
+		gin.LoggerWithConfig(gin.LoggerConfig{
+			Output: &mylog.Writer,
+			Formatter: func(param gin.LogFormatterParams) string {
+				v := fmt.Sprint(
+					// 时间
+					param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
+					// 客户端IP
+					param.ClientIP, " ",
+					// 状态码
+					param.StatusCode, " ",
+					// 请求方法
+					param.Method, " ",
+					// 请求路径
+					param.Path,
+				)
+				// 错误消息
+				if param.ErrorMessage != "" {
+					v += " " + param.ErrorMessage
+					if v[len(v)-1] == '\n' {
+						return v
+					}
+				}
+				v += "\n"
+				return v
+			},
+		}),
+
 		func(ctx *gin.Context) {
 			wh := ctx.Writer.Header()
 			// 拒绝跨域请求
@@ -72,50 +102,20 @@ func GetHandler() http.Handler {
 				ctx.AbortWithError(403, fmt.Errorf("cross origin request from %q", origin))
 				return
 			}
-			// 增加响应头
-			for _, v := range conf.Http.Only_AddHeaders {
-				for k, v := range v {
-					wh.Add(k, v)
-				}
-			}
 			wh.Set("Cache-Control", "no-cache")
+			wh.Set("X-Robots-Tag", "noindex, nofollow")
 			wh.Set("Referrer-Policy", "no-referrer")
 		},
-	)
 
-	// GZIP
-	if conf.Http.Old_GzipLevel != 0 {
-		Router.Use(gzip.NewHandler(gzip.Config{
-			// gzip compression level to use
-			CompressionLevel: conf.Http.Old_GzipLevel,
-			// minimum content length to trigger gzip, the unit is in byte.
-			MinContentLength: conf.Http.Old_GzipMinContentLength,
-			// RequestFilter decide whether or not to compress response judging by request.
-			// Filters are applied in the sequence here.
-			RequestFilter: []gzip.RequestFilter{
-				gzip.NewCommonRequestFilter(),
-				gzip.DefaultExtensionFilter(),
-			},
-			// ResponseHeaderFilter decide whether or not to compress response
-			// judging by response header
-			ResponseHeaderFilter: []gzip.ResponseHeaderFilter{
-				gzip.NewSkipCompressedFilter(),
-				gzip.DefaultContentTypeFilter(),
-			},
-		}).Gin)
-	}
+		gzip.DefaultHandler().Gin,
+	)
 
 	const dist = "frontend-antd/dist/"
 
 	// 404
 	noRoute := func(ctx *gin.Context) {
-		if strings.HasPrefix(ctx.GetHeader("Accept"), "text/html") {
-			f, _ := os.ReadFile(dist + "404.html")
-			ctx.Data(404, gin.MIMEHTML, f)
-			return
-		}
-		ctx.Status(404)
-		ctx.Writer.Write(nil)
+		f, _ := os.ReadFile(dist + "404.html")
+		ctx.Data(404, gin.MIMEHTML, f)
 	}
 	Router.NoRoute(noRoute)
 	gzipstatic.NoRoute = noRoute
@@ -186,63 +186,4 @@ func GetHandler() http.Handler {
 	apiInit(mainGroup.Group("api"))
 
 	return Router.Handler()
-}
-
-var logger = gin.LoggerWithConfig(gin.LoggerConfig{
-	Output: &mylog.Writer,
-	Formatter: func(param gin.LogFormatterParams) string {
-		v := fmt.Sprint(
-			// 时间
-			param.TimeStamp.Format("2006/01/02 15:04:05"), " [GIN] ",
-			// 客户端IP
-			param.ClientIP, " ",
-			// 状态码
-			param.StatusCode, " ",
-			// 请求方法
-			param.Method, " ",
-			// 请求路径
-			param.Path,
-		)
-		// 错误消息
-		if param.ErrorMessage != "" {
-			v += " " + param.ErrorMessage
-			if v[len(v)-1] == '\n' {
-				return v
-			}
-		}
-		v += "\n"
-		return v
-	},
-})
-
-func handlerCheckNotLoggedIn401(ctx *gin.Context) {
-	if !mysession.CheckLoggedInCookieForCtx(ctx) {
-		ctx.AbortWithStatus(401)
-	}
-}
-
-func handlerRemoveQuery(ctx *gin.Context) {
-	if ctx.Request.URL.RawQuery != "" {
-		// 移除参数
-		redirect(ctx, 301, ctx.Request.URL.Path)
-		ctx.Abort()
-	}
-}
-
-func redirect(ctx *gin.Context, code int, path string) {
-	hlfhr.Redirect(ctx.Writer, code, path)
-}
-
-func getClientIP(ctx *gin.Context) string {
-	if conf.Http.Only_EnableXRealIp && getXForwarderAuth(ctx) {
-		XRealIp := ctx.GetHeader("X-Real-Ip")
-		if XRealIp != "" {
-			return XRealIp
-		}
-	}
-	return ctx.RemoteIP()
-}
-
-func getXForwarderAuth(ctx *gin.Context) bool {
-	return conf.Http.Only_XForwarderAuth == "" || hmac.Equal([]byte(ctx.GetHeader("X-Forwarder-Auth")), []byte(conf.Http.Only_XForwarderAuth))
 }

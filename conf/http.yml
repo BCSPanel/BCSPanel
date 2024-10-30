@@ -6,64 +6,9 @@
 # 仅监听IPv4本地回环地址: "127.0.0.1:24124"
 # 仅监听IPv6本地回环地址: "[::1]:24124"
 listen: 24124
-
-# Gzip 压缩等级，等级越高越消耗 CPU 。
-# 参考 https://pkg.go.dev/github.com/nanmu42/gzip@v1.2.0#Config.CompressionLevel
-# 类型: int
-# 默认: 5
-# 最高: 9
-# 关闭: 0
-# 最低: -3
-gzip_level: 5
-
-# 内容超过多少字节才会进行 Gzip 压缩。
-# 该配置在关闭 Gzip 压缩时不会生效。
-# 类型: int64
-# 默认: 1024
-gzip_min_content_length: 1024
-
 # 路径前缀
 # 规范: 开头与结尾必须是正斜杠，中间不得包含[0-9a-zA-Z]以外的字符
 # 类型: string
 # 默认: /
 # 示范: /bcspanel/
 path_prefix: /
-
-# 打印 Gin 框架的日志。
-# 类型: bool
-# 默认: true
-enable_gin_log: true
-
-# 空闲时继续保持连接直到超过多少秒。
-# 类型: int
-# 默认: 180
-# 永久: 0
-# 关闭保持连接: -1
-keep_alive_second: 180
-
-# 启用识别客户端IP优先采用请求头 X-Real-Ip
-# 类型: bool
-# 默认: false
-enable_x_real_ip: false
-
-# 反向代理身份验证请求头 X-Forwarder-Auth 的内容
-# 用于验证反向代理服务器的身份，为空则不验证
-# 类型: string
-# 默认: ""
-# 不安全的演示: "123456"
-x_forwarder_auth: ""
-
-# 添加响应头
-add_headers:
-  - X-Robots-Tag: noindex, nofollow
-  # - Server: BCSPanel
-  # - Strict-Transport-Security: max-age=31536000
-
-# （实验性）启用 HTTP/2 H2C 协议。
-# 不建议启用，主流浏览器都不支持，反向代理稳定性未知。
-# 该配置在使用 HTTPS 时不会生效。
-# 参考 https://github.com/golang/go/issues/14141
-# 参考 https://github.com/gin-gonic/gin/pull/1398
-# 类型: bool
-# 默认: false
-enable_h2c: false

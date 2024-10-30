@@ -12,16 +12,6 @@ enable: false
 # 默认: true
 enable_listen_80_redirect: true
 
-# 启用 HTTP/2 。
-# 类型: bool
-# 默认: true
-enable_http2: true
-
-# 如果找不到与名称匹配的证书，拒绝握手。
-# 类型: bool
-# 默认: false
-enable_reject_handshake_if_unrecognized_name: false
-
 # 存放在 conf/cert 目录下的证书文件名与私钥文件名。
 certs: 
   - cert: "localhost.crt"

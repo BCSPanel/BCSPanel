@@ -1,7 +1,6 @@
 package conf
 
 import (
-	"github.com/bddjr/BCSPanel/src/isservermode"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/spf13/viper"
 )
@@ -16,9 +15,7 @@ var Cmdport ConfigCmdportType
 func (c *ConfigCmdportType) UpdateConfig_cmdport() {
 	readingLock.Lock()
 	defer readingLock.Unlock()
-	if isservermode.IsServerMode {
-		mylog.INFOln("updateConfig_cmdport")
-	}
+	mylog.INFOln("updateConfig_cmdport")
 	// 读robots
 	viper.SetConfigFile("./conf/cmdport.yml")
 	viper.SetConfigType("yaml")

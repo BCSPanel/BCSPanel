@@ -5,11 +5,9 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/bddjr/BCSPanel/src/cmdclient"
 	"github.com/bddjr/BCSPanel/src/cmdserver"
 	"github.com/bddjr/BCSPanel/src/conf"
 	"github.com/bddjr/BCSPanel/src/httpserver"
-	"github.com/bddjr/BCSPanel/src/isservermode"
 	"github.com/bddjr/BCSPanel/src/mygc"
 	"github.com/bddjr/BCSPanel/src/myinit"
 	"github.com/bddjr/BCSPanel/src/mylog"
@@ -22,7 +20,7 @@ func main() {
 	defer func() {
 		if r := recover(); r != nil {
 			mylog.ERRORln(r)
-			mainShutdown(1)
+			shutdown.Shutdown(1)
 		}
 	}()
 
@@ -37,42 +35,16 @@ func main() {
 		// syscall.SIGTSTP,
 	)
 
+	myinit.Init()
+	mylog.INFOln("main test RandBytes")
+	myrand.RandBytes(1)
+
+	conf.UpdateConfig()
+	httpserver.Start()
+	cmdserver.Start()
+	go mygc.GC_laterSecond(1)
+
 	// 捕捉停止信号
-	go func() {
-		<-signalCtrlC
-		mainShutdown(1)
-	}()
-
-	if isservermode.IsServerMode {
-		myinit.Init()
-		mylog.INFOln("main test RandBytes")
-		myrand.RandBytes(1)
-
-		conf.UpdateConfig()
-		httpserver.Start()
-		cmdserver.Start()
-		go mygc.GC_laterSecond(1)
-
-		// 检测reload信号
-		// go func() {
-		// 	for {
-		// 		signalReload := make(chan os.Signal, 1)
-		// 		signal.Notify(signalReload, syscall.Signal(30))
-		// 		<-signalReload
-		// 		reload.Reload()
-		// 	}
-		// }()
-
-		// 永远阻塞
-		select {}
-	} else {
-		cmdclient.Run()
-	}
-}
-
-func mainShutdown(code int) {
-	if isservermode.IsServerMode {
-		shutdown.Shutdown(code)
-	}
-	os.Exit(code)
+	<-signalCtrlC
+	shutdown.Shutdown(1)
 }
