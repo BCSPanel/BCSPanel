@@ -11,9 +11,9 @@ Use git bash on windows
 git clone https://github.com/BCSPanel/BCSPanel
 cd BCSPanel
 
-chmod +x init.sh build.sh buildgo.sh run.sh
+chmod +x init.sh build.sh buildgo.sh run.sh testrun.sh
 
-rm -rf frontend-antd frontend-login2
+rm -rf frontend frontend-login
 ./init.sh
 ```
 
