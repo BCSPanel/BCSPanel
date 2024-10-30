@@ -7,7 +7,6 @@ require (
 	github.com/bddjr/hlfhr v1.1.3
 	github.com/bddjr/nametocert-go v0.1.0
 	github.com/gin-gonic/gin v1.10.0
-	github.com/spf13/viper v1.19.0
 )
 
 require (
