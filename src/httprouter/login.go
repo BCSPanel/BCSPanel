@@ -3,7 +3,7 @@ package httprouter
 import (
 	"net/http"
 
-	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/BCSPanel/src/user"
 	"github.com/gin-gonic/gin"
@@ -81,7 +81,7 @@ func (a apiLogin) handlerLogout(ctx *gin.Context) {
 		ctx.SetCookie(mysession.SessionCookieName, "x", -1, "", "", false, true)
 	}
 	// 重定向
-	redirect(ctx, 303, conf.Http.Old_PathPrefix+"login/")
+	redirect(ctx, 303, config.OldHttp.PathPrefix+"login/")
 }
 
 func (a apiLogin) handlerUpdateLastUsageTime(ctx *gin.Context) {

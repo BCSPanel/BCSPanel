@@ -1,10 +1,12 @@
 package cmdserver
 
 import (
+	"errors"
 	"io/fs"
 	"net"
 
 	"github.com/bddjr/BCSPanel/src/bcspcp"
+	"github.com/bddjr/BCSPanel/src/cmdserver/cmdservercloser"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/reload"
 	"github.com/bddjr/BCSPanel/src/shutdown"
@@ -26,9 +28,10 @@ func start() {
 	srv := &bcspcp.Server{
 		Handler: handler,
 	}
+	cmdservercloser.SetCloser(srv.Close)
 
 	err := srv.ListenAndServe()
-	if err != nil {
+	if err != nil && !errors.Is(err, net.ErrClosed) {
 		mylog.ERROR("cmdserver error: ", err)
 	}
 }

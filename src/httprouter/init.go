@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/gzipstatic-gin"
@@ -39,12 +39,6 @@ func apiInit(apiGroup *gin.RouterGroup) {
 // var regexpUserAgentBot = regexp.MustCompile(`[bB][oO][tT]`)
 
 func GetHandler() http.Handler {
-	// 设置配置文件
-	conf.Http.Old_PathPrefix = conf.Http.New_PathPrefix
-	conf.Http.Old_GzipLevel = conf.Http.New_GzipLevel
-	conf.Http.Old_GzipMinContentLength = conf.Http.New_GzipMinContentLength
-	conf.Http.Old_EnableH2c = conf.Http.New_EnableH2c
-
 	// 创建新的路由
 	Router := gin.New()
 	Router.HandleMethodNotAllowed = true
@@ -125,8 +119,8 @@ func GetHandler() http.Handler {
 
 	// group
 	mainGroup := &Router.RouterGroup
-	if conf.Http.Old_PathPrefix != "/" {
-		mainGroup = mainGroup.Group(conf.Http.Old_PathPrefix)
+	if config.OldHttp.PathPrefix != "/" {
+		mainGroup = mainGroup.Group(config.OldHttp.PathPrefix)
 	}
 
 	// frontend

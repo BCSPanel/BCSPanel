@@ -3,9 +3,7 @@
 /main.exe
 /main
 /log/
-/conf/
-/.vs/
-/cache/
+/config/
 /data/
 /temp-bcspcp/
 /command/main.exe

@@ -1,8 +1,7 @@
 package reload
 
 import (
-	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
-	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/httpserver"
 	"github.com/bddjr/BCSPanel/src/mygc"
 	"github.com/bddjr/BCSPanel/src/mylog"
@@ -23,8 +22,7 @@ func Reload() {
 	mylog.INFOln("Reload")
 	mysession.Reload()
 	user.Reload()
-	conf.UpdateConfig()
+	config.Update()
 	httpserver.Reload()
-	sharecmdlistener.Reload()
 	go mygc.GC_laterSecond(1)
 }

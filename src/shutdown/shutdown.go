@@ -3,7 +3,7 @@ package shutdown
 import (
 	"os"
 
-	"github.com/bddjr/BCSPanel/src/cmdserver/sharecmdlistener"
+	"github.com/bddjr/BCSPanel/src/cmdserver/cmdservercloser"
 	"github.com/bddjr/BCSPanel/src/httpserver"
 	"github.com/bddjr/BCSPanel/src/mylog"
 )
@@ -22,5 +22,5 @@ func Shutdown(code int) {
 	mylog.INFOln("Shutdown")
 
 	httpserver.CloseServerAll()
-	sharecmdlistener.Close()
+	cmdservercloser.Close()
 }

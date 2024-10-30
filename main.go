@@ -6,7 +6,7 @@ import (
 	"syscall"
 
 	"github.com/bddjr/BCSPanel/src/cmdserver"
-	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/httpserver"
 	"github.com/bddjr/BCSPanel/src/mygc"
 	"github.com/bddjr/BCSPanel/src/myinit"
@@ -39,9 +39,9 @@ func main() {
 	mylog.INFOln("main test RandBytes")
 	myrand.RandBytes(1)
 
-	conf.UpdateConfig()
-	httpserver.Start()
+	config.Update()
 	cmdserver.Start()
+	httpserver.Start()
 	go mygc.GC_laterSecond(1)
 
 	// 捕捉停止信号

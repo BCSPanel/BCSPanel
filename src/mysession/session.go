@@ -6,7 +6,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/bddjr/BCSPanel/src/conf"
+	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/myrand"
 	"github.com/gin-gonic/gin"
 )
@@ -103,7 +103,7 @@ func CreateLoggedInCookie(userId int, secure bool) (cookie *http.Cookie, err err
 	cookie = &http.Cookie{
 		Name:     SessionCookieName,
 		Value:    userRandomId + sessionId,
-		Path:     conf.Http.Old_PathPrefix,
+		Path:     config.OldHttp.PathPrefix,
 		Secure:   secure,
 		HttpOnly: true,
 		// MaxAge:   int(MaxAge.Seconds()),
