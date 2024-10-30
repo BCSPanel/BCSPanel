@@ -3,12 +3,12 @@ set -e
 
 git submodule update --init --remote
 
-cd frontend-antd
-git checkout main
+cd frontend
+git checkout master
 npm i
 cd ..
 
-cd frontend-login2
+cd frontend-login
 git checkout master
 npm i
 cd ..

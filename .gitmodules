@@ -1,7 +1,7 @@
-[submodule "frontend-antd"]
-path = frontend-antd
-url = https://github.com/BCSPanel/frontend-antd
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/BCSPanel/frontend
 
 [submodule "frontend-login"]
 	path = frontend-login
-url = https://github.com/BCSPanel/frontend-login
+	url = https://github.com/BCSPanel/frontend-login

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-cd frontend-antd
+cd frontend
 npm run build
 cd ..
 

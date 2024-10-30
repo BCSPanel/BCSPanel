@@ -110,7 +110,7 @@ func GetHandler() http.Handler {
 		gzip.DefaultHandler().Gin,
 	)
 
-	const dist = "frontend-antd/dist/"
+	const dist = "frontend/dist/"
 
 	// 404
 	noRoute := func(ctx *gin.Context) {
@@ -168,7 +168,7 @@ func GetHandler() http.Handler {
 
 	// login
 	{
-		const dist = "frontend-login2/dist/"
+		const dist = "frontend-login/dist/"
 		g := mainGroup.Group("login")
 		indexPath := g.BasePath() + "/"
 		g.Use(func(ctx *gin.Context) {
