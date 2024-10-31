@@ -48,6 +48,7 @@ func (w *writer) updateFile() (ok bool) {
 		exist = true
 	}
 
+	os.Mkdir("log", FileMode)
 	w.f, err = os.OpenFile(
 		name,
 		os.O_WRONLY|os.O_CREATE|os.O_APPEND,
