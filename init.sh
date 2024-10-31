@@ -7,3 +7,5 @@ cd frontend
 git checkout main
 npm i
 cd ..
+
+go get
