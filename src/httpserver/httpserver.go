@@ -77,19 +77,19 @@ func serverHttpListen() {
 	{
 		// print
 		schemeName := "http"
-		if config.NewHttp.SSL.Enable {
+		if config.OldHttp.SSL.Enable {
 			schemeName += "s"
 		}
-		mylog.INFO(schemeName, "://localhost:", config.NewHttp.AddrPort, config.NewHttp.PathPrefix)
+		mylog.INFO(schemeName, "://localhost:", config.OldHttp.AddrPort, config.OldHttp.PathPrefix)
 	}
 
 	ServerHttp = hlfhr.New(&http.Server{
-		Addr:              config.NewHttp.Addr,
+		Addr:              config.OldHttp.Addr,
 		Handler:           httprouter.GetHandler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	})
 	var err error
-	if config.NewHttp.SSL.Enable {
+	if config.OldHttp.SSL.Enable {
 		// https
 		go server80Listen()
 		err = ServerHttp.ListenAndServeTLS("", "")

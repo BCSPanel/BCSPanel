@@ -45,7 +45,7 @@ func GetHandler() http.Handler {
 	Router.RedirectFixedPath = true
 
 	// https://github.com/gin-gonic/gin/pull/1398
-	Router.UseH2C = true
+	Router.UseH2C = config.OldHttp.H2C
 
 	// 中间件
 	Router.Use(
