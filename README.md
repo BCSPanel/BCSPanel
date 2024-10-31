@@ -10,11 +10,13 @@ Use git bash on windows
 ```
 git clone https://github.com/BCSPanel/BCSPanel
 cd BCSPanel
+chmod +x build.sh buildgo.sh run.sh testrun.sh
+go get
 
-chmod +x init.sh build.sh buildgo.sh run.sh testrun.sh
-
-rm -rf frontend
-./init.sh
+git clone https://github.com/BCSPanel/frontend
+cd frontend
+npm i
+cd ..
 ```
 
 ---

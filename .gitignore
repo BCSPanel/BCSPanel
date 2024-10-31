@@ -1,12 +1,11 @@
-/BCSPanel.exe
-/BCSPanel
-/main.exe
-/main
 /log/
 /config/
 /data/
 /temp-bcspcp/
-/command/main.exe
+/frontend/
+
+*.exe
+/BCSPanel
+/main
 /command/main
-/command/command.exe
 /command/command
