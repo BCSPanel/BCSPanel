@@ -108,6 +108,7 @@ func GetHandler() http.Handler {
 
 	// 404
 	noRoute := func(ctx *gin.Context) {
+		ctx.Writer.Header().Del("Cache-Control")
 		f, _ := os.ReadFile(dist + "404.html")
 		ctx.Data(404, gin.MIMEHTML, f)
 	}
@@ -123,58 +124,26 @@ func GetHandler() http.Handler {
 		mainGroup = mainGroup.Group(config.OldHttp.PathPrefix)
 	}
 
-	// frontend
-	mainGroup.GET("/", func(ctx *gin.Context) {
-		if !mysession.CheckLoggedInCookieForCtx(ctx) {
-			// 未登录
-			redirect(ctx, 303, "./login/")
-			return
-		}
-		// 网页
-		// ctx.File(dist)
-		gzipstatic.File(ctx, dist)
-	})
-	files, err := os.ReadDir(dist)
-	if err != nil {
-		panic(err)
-	}
-	for _, f := range files {
-		name := f.Name()
-		if name[0] == '[' {
-			continue
-		}
-		switch name {
-		case "index.html", "robots.txt", "login", "api":
-			continue
-		}
-		if f.IsDir() {
-			g := mainGroup.Group(name)
-			if name == "assets" {
-				g.Use(handlerCheckNotLoggedIn401)
-			}
-			// g.Static("/", dist+name)
-			gzipstatic.Static(g, "/", dist+name)
-			continue
-		}
-		// mainGroup.StaticFile(name, dist+name)
-		gzipstatic.StaticFile(mainGroup, name, dist+name)
+	{
+		g := mainGroup.Group("assets")
+		g.Use(func(ctx *gin.Context) {
+			ctx.Header("Cache-Control", "max-age=86400")
+		})
+		gzipstatic.Static(g, "/", dist+"assets")
 	}
 
-	// login
-	{
-		const dist = "frontend-login/dist/"
-		g := mainGroup.Group("login")
-		indexPath := g.BasePath() + "/"
-		g.Use(func(ctx *gin.Context) {
-			if ctx.Request.URL.Path == indexPath && mysession.CheckLoggedInCookieForCtx(ctx) {
-				// 已登录
-				redirect(ctx, 303, "../")
-				ctx.Abort()
-			}
-		})
-		// g.Static("/", dist)
-		gzipstatic.Static(g, "/", dist)
-	}
+	gzipstatic.StaticFile(mainGroup, "loading-failed.js", dist+"loading-failed.js")
+
+	// index
+	mainGroup.GET("/", func(ctx *gin.Context) {
+		ctx.Request.Header.Del("If-Modified-Since")
+		ctx.Header("Cache-Control", "no-store")
+		if mysession.CheckLoggedInCookieForCtx(ctx) {
+			gzipstatic.File(ctx, dist)
+		} else {
+			gzipstatic.File(ctx, dist+"login.html")
+		}
+	})
 
 	// api
 	apiInit(mainGroup.Group("api"))
