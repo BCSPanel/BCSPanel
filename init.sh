@@ -4,6 +4,6 @@ set -e
 git submodule update --init --remote
 
 cd frontend
-git checkout master
+git checkout main
 npm i
 cd ..
