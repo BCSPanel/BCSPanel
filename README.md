@@ -13,7 +13,7 @@ cd BCSPanel
 
 chmod +x init.sh build.sh buildgo.sh run.sh testrun.sh
 
-rm -rf frontend frontend-login
+rm -rf frontend
 ./init.sh
 ```
 
