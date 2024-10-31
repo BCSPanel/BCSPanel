@@ -1,0 +1,15 @@
+{
+    "addr": ":24124",
+    "path_prefix": "/",
+    "h2c": false,
+    "ssl": {
+        "enable": false,
+        "listen_80_port": true,
+        "certs": [
+            {
+                "cert": "certs/localhost.crt",
+                "key": "certs/localhost.key"
+            }
+        ]
+    }
+}
