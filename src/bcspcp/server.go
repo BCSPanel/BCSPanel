@@ -27,7 +27,7 @@ type Server struct {
 	Handler   func(ctx *Context) error
 	ErrorLogf ErrorLogf
 
-	// Default: "temp-bcspcp"
+	// Default: ".bcspcp"
 	SocketTempDir string
 
 	closeListener func() error
@@ -41,10 +41,18 @@ func (srv *Server) logf(format string, v ...any) {
 	}
 }
 
+func (srv *Server) getDirName() string {
+	if srv.SocketTempDir != "" {
+		return srv.SocketTempDir
+	}
+	return DefaultSockDir
+}
+
 func (srv *Server) Close() {
 	if srv.closeListener != nil {
 		srv.closeListener()
 		srv.closeListener = nil
+		os.Remove(srv.getDirName())
 	}
 }
 
@@ -53,10 +61,7 @@ func (srv *Server) ListenAndServe() error {
 		return errors.New("bcspcp: listening")
 	}
 
-	dir := srv.SocketTempDir
-	if dir == "" {
-		dir = DefaultSockDir
-	}
+	dir := srv.getDirName()
 	sockPath := filepath.Join(dir, DefaultSockName)
 
 	err := os.MkdirAll(dir, SockFilePerm)
