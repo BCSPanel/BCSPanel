@@ -21,49 +21,46 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	// 退出登录，如果有效
 	mysession.LogOutSessionForRequest(ctx.Request)
 
-	type loginJsonType struct {
+	type formType struct {
 		// 安全上下文
 		Secure bool `json:"secure"`
-		// 是否处于注册模式
-		Isregister bool `json:"isregister"`
 		// 用户名
 		Username string `json:"username"`
 		// 密码
 		Password string `json:"password"`
-		// 注册模式发送验证码
-		VerifyCode string `json:"verify_code"`
 	}
 
 	// 解析表单
-	loginJson := &loginJsonType{}
-	err := ctx.BindJSON(loginJson)
+	form := &formType{}
+	err := ctx.BindJSON(form)
 	if err != nil {
 		ctx.String(400, err.Error())
 		ctx.Error(err)
 		return
 	}
 
-	var cookie *http.Cookie
-	if loginJson.Isregister {
-		// 注册
-		cookie, err = user.Register(loginJson.Username, loginJson.Password, loginJson.VerifyCode, loginJson.Secure)
-	} else {
-		// 登录
-		cookie, err = user.Login(loginJson.Username, loginJson.Password, loginJson.Secure)
+	// 登录
+	user, err := user.Get(form.Username)
+	if err != nil {
+		ctx.Status(500)
+		ctx.Error(err)
+		return
+	}
+	if !user.PasswordEqual(form.Password) {
+		// 密码错误
+		ctx.String(401, err.Error())
+		ctx.Error(err)
+		return
 	}
 
-	if a.loginSetCookie(ctx, cookie, err) {
-		// 成功
-		ctx.Status(200)
-	}
+	cookie, err := mysession.CreateLoggedInCookie(form.Username, form.Secure)
+	ctx.SetCookie()
+	ctx.Status(200)
 }
 
 func (a apiLogin) loginSetCookie(ctx *gin.Context, cookie *http.Cookie, err error) (ok bool) {
 	if err != nil {
-		// 失败
-		ctx.String(401, err.Error())
-		ctx.Error(err)
-		return false
+
 	}
 	// 成功
 	ctx.Writer.Header().Add("Set-Cookie", cookie.String())
