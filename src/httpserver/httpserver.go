@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bddjr/BCSPanel/src/config"
-	"github.com/bddjr/BCSPanel/src/httprouter"
+	"github.com/bddjr/BCSPanel/src/httpserver/router"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/hlfhr"
 )
@@ -85,7 +85,7 @@ func serverHttpListen() {
 
 	ServerHttp = hlfhr.New(&http.Server{
 		Addr:              config.OldHttp.Addr,
-		Handler:           httprouter.GetHandler(),
+		Handler:           router.GetHandler(),
 		ReadHeaderTimeout: 10 * time.Second,
 	})
 	var err error
