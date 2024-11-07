@@ -1,9 +1,7 @@
 package bcspcp
 
 import (
-	"bytes"
 	"errors"
-	"io"
 	"log"
 	"net"
 	"os"
@@ -100,23 +98,7 @@ func (srv *Server) serve(c net.Conn) {
 		}
 	}()
 
-	b := make([]byte, len(ProtocolVersionHeader))
-	setReadTimeout10s(c)
-	_, err := io.ReadFull(c, b)
-	if err != nil {
-		srv.logf("bcspcp: read error: %v", err)
-		return
-	}
-
-	setReadTimeout0(c)
-	if !bytes.Equal(b, ProtocolVersionHeader) {
-		c.Write([]byte{1})
-		srv.logf("bcspcp: read header %q does not supported", b)
-		return
-	}
-	c.Write([]byte{0})
-
-	err = srv.Handler(&Context{Conn: c})
+	err := srv.Handler(&Context{Conn: c})
 	if err != nil {
 		srv.logf("bcspcp: handler error: %v", err)
 	}
