@@ -46,23 +46,32 @@ func handler(ctx *bcspcp.Context) error {
 	case "query":
 		switch rMsg["name"] {
 		case "user_exist":
-			//
+			ctx.WriteMsg(bcspcp.Message{
+				"exist": user.Exist(rMsg["username"].(string)),
+			})
 		default:
 			ctx.WriteMsg(bcspcp.Message{
 				"error": "unknown query",
 			})
 		}
 	case "command":
-		switch rMsg["name"] {
+		switch rMsg["name"].(string) {
 		case "reload":
 			reload.Reload()
+			ctx.WriteMsg(bcspcp.Message{})
 		case "shutdown":
 			shutdown.Shutdown(0)
-		case "verifycode":
-			ctx.WriteMsg(bcspcp.Message{
-				"verifycode": user.RegisterVerifyCode.Fill().Code,
-				"expire":     user.RegisterVerifyCode.ExpirationTime.Format(user.TimeFormat),
-			})
+		case "register":
+			username := rMsg["username"].(string)
+			password := rMsg["password"].(string)
+			_, err := user.Create(username, password)
+			if err != nil {
+				ctx.WriteMsg(bcspcp.Message{
+					"error": err.Error(),
+				})
+				return err
+			}
+			ctx.WriteMsg(bcspcp.Message{})
 		default:
 			ctx.WriteMsg(bcspcp.Message{
 				"error": "unknown command",

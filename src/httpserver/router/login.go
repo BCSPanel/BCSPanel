@@ -14,12 +14,11 @@ type apiLogin struct{}
 func (a apiLogin) Init(g *gin.RouterGroup) {
 	g.POST("/login", a.handlerLogin)
 	g.GET("/logout", a.handlerLogout)
-	g.GET("/update-last-usage-time", a.handlerUpdateLastUsageTime)
+	g.GET("/keepsession", a.handlerKeepSession)
 }
 
 func (a apiLogin) handlerLogin(ctx *gin.Context) {
-	// 退出登录，如果有效
-	mysession.LogOutSessionForRequest(ctx.Request)
+	mysession.LogOutForCtx(ctx)
 
 	type formType struct {
 		// 安全上下文
@@ -40,49 +39,28 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	}
 
 	// 登录
-	user, err := user.Get(form.Username)
-	if err != nil {
-		ctx.Status(500)
-		ctx.Error(err)
-		return
-	}
-	if !user.PasswordEqual(form.Password) {
-		// 密码错误
-		ctx.String(401, err.Error())
-		ctx.Error(err)
+	u, err := user.GetForLogin(form.Username)
+	if err != nil || !u.PasswordEqual(form.Password) {
+		ctx.String(401, "@invalid-username-or-password")
 		return
 	}
 
-	cookie, err := mysession.CreateLoggedInCookie(form.Username, form.Secure)
-	ctx.SetCookie()
+	cookie, err := mysession.Create(form.Username, form.Secure)
+	if err != nil {
+		ctx.AbortWithError(500, err)
+		return
+	}
+	http.SetCookie(ctx.Writer, cookie)
 	ctx.Status(200)
 }
 
-func (a apiLogin) loginSetCookie(ctx *gin.Context, cookie *http.Cookie, err error) (ok bool) {
-	if err != nil {
-
-	}
-	// 成功
-	ctx.Writer.Header().Add("Set-Cookie", cookie.String())
-	return true
-}
-
 func (a apiLogin) handlerLogout(ctx *gin.Context) {
-	// 退出登录
-	cookie, ok := mysession.LogOutSessionForRequest(ctx.Request)
-	if ok {
-		// 会话有效，已退出
-		ctx.Writer.Header().Add("Set-Cookie", cookie.String())
-	} else {
-		// 强制退出
-		ctx.SetCookie(mysession.SessionCookieName, "x", -1, "", "", false, true)
-	}
-	// 重定向
+	mysession.LogOutForCtx(ctx)
 	redirect(ctx, 303, config.OldHttp.PathPrefix)
 }
 
-func (a apiLogin) handlerUpdateLastUsageTime(ctx *gin.Context) {
-	if mysession.CheckLoggedInCookieForCtx(ctx) {
+func (a apiLogin) handlerKeepSession(ctx *gin.Context) {
+	if mysession.CheckCtx(ctx) {
 		ctx.Status(200)
 		return
 	}

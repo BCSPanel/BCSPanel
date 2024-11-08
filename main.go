@@ -8,8 +8,6 @@ import (
 	"github.com/bddjr/BCSPanel/src/cmdserver"
 	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/httpserver"
-	"github.com/bddjr/BCSPanel/src/mygc"
-	"github.com/bddjr/BCSPanel/src/myinit"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/shutdown"
 )
@@ -23,24 +21,17 @@ func main() {
 		}
 	}()
 
-	myinit.Init()
-
 	config.Update()
 	cmdserver.Start()
 	httpserver.Start()
-	go mygc.GC_laterSecond(1)
 
 	// 捕捉停止信号
-	signalCtrlC := make(chan os.Signal, 1)
-	signal.Notify(signalCtrlC,
-		// CTRL+C
-		syscall.SIGINT,
-		// kill
-		syscall.SIGTERM,
-
+	signalStop := make(chan os.Signal, 1)
+	signal.Notify(signalStop,
+		syscall.SIGINT,  // CTRL+C
+		syscall.SIGTERM, // kill
 		syscall.SIGHUP,
-		// syscall.SIGTSTP,
 	)
-	<-signalCtrlC
+	<-signalStop
 	shutdown.Shutdown(1)
 }

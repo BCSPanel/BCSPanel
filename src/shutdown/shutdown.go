@@ -17,7 +17,6 @@ func Shutdown(code int) {
 	Shutingdown = true
 
 	defer os.Exit(code)
-	defer os.RemoveAll("cache")
 
 	mylog.INFOln("Shutdown")
 

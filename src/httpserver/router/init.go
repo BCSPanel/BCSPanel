@@ -19,7 +19,7 @@ func init() {
 }
 
 func handlerCheckNotLoggedIn401(ctx *gin.Context) {
-	if !mysession.CheckLoggedInCookieForCtx(ctx) {
+	if !mysession.CheckCtx(ctx) {
 		ctx.AbortWithStatus(401)
 	}
 }
@@ -75,7 +75,6 @@ func GetHandler() http.Handler {
 				return v
 			},
 		}),
-
 		func(ctx *gin.Context) {
 			wh := ctx.Writer.Header()
 			// 拒绝跨域请求
@@ -100,7 +99,6 @@ func GetHandler() http.Handler {
 			wh.Set("X-Robots-Tag", "noindex, nofollow")
 			wh.Set("Referrer-Policy", "no-referrer")
 		},
-
 		gzip.DefaultHandler().Gin,
 	)
 
@@ -138,7 +136,7 @@ func GetHandler() http.Handler {
 	mainGroup.GET("/", func(ctx *gin.Context) {
 		ctx.Request.Header.Del("If-Modified-Since")
 		ctx.Header("Cache-Control", "no-store")
-		if mysession.CheckLoggedInCookieForCtx(ctx) {
+		if mysession.CheckCtx(ctx) {
 			gzipstatic.File(ctx, dist)
 		} else {
 			gzipstatic.File(ctx, dist+"login.html")
