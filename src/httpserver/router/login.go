@@ -39,8 +39,7 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	}
 
 	// 登录
-	u, err := user.GetForLogin(form.Username)
-	if err != nil || !u.PasswordEqual(form.Password) {
+	if !user.Login(form.Username, form.Password) {
 		ctx.String(401, "@invalid-username-or-password")
 		return
 	}

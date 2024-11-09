@@ -105,13 +105,14 @@ func Get(name string) (*User, error) {
 	return u, err
 }
 
-func GetForLogin(name string) (*User, error) {
+func Login(name string, passwd string) bool {
 	u, err := Get(name)
-	if err == nil {
-		u.recentLoginTimeSet()
-		err = u.write()
+	if err != nil || !u.passwordEqual(passwd) {
+		return false
 	}
-	return u, err
+	u.recentLoginTimeSet()
+	u.write()
+	return true
 }
 
 func exist(name string) bool {
