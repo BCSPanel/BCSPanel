@@ -68,14 +68,8 @@ func GetHandler() http.Handler {
 			},
 		}),
 		func(ctx *gin.Context) {
-			wh := ctx.Writer.Header()
 			// 拒绝跨域请求
 			origin := ctx.GetHeader("Origin")
-			if len(origin) > len("https://")+255+len(":65535") {
-				// 请求头内容太长了，不像正常的
-				ctx.AbortWithStatus(431)
-				return
-			}
 			switch origin {
 			case "",
 				"https://" + ctx.Request.Host,
@@ -83,13 +77,15 @@ func GetHandler() http.Handler {
 				// 没跨域
 			default:
 				// 跨域了
-				wh.Del("Allow")
+				ctx.Writer.Header().Del("Allow")
 				ctx.AbortWithError(403, fmt.Errorf("cross origin request from %q", origin))
 				return
 			}
-			wh.Set("Cache-Control", "no-cache")
-			wh.Set("X-Robots-Tag", "noindex, nofollow")
-			wh.Set("Referrer-Policy", "no-referrer")
+		},
+		func(ctx *gin.Context) {
+			ctx.Header("Cache-Control", "no-cache")
+			ctx.Header("X-Robots-Tag", "noindex, nofollow")
+			ctx.Header("Referrer-Policy", "no-referrer")
 		},
 		gzip.DefaultHandler().Gin,
 	)

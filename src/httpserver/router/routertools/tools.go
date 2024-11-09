@@ -10,6 +10,7 @@ import (
 func CheckNotLoggedIn401(ctx *gin.Context) {
 	if !mysession.CheckCtx(ctx) {
 		ctx.AbortWithStatus(401)
+		return
 	}
 }
 
