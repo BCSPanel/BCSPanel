@@ -21,5 +21,19 @@ func readPassword(print string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(passwd), nil
+
+	str := ""
+	for _, b := range passwd {
+		if b > 31 && b < 127 {
+			// ASCII visible characters
+			str += string(b)
+		} else if b == 127 {
+			// backspace
+			if str != "" {
+				str = str[:len(str)-1]
+			}
+		}
+		// ignore other key
+	}
+	return str, nil
 }

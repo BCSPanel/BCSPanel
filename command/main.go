@@ -79,13 +79,12 @@ func main() {
 			if err != nil {
 				errExit(err)
 			}
-			repeatPasswd, err := readPassword("Repeat password: ")
-			fmt.Println()
-			if err != nil {
-				errExit(err)
-			}
 			if len(passwd) < 10 {
 				errExit("password length < 10")
+			}
+			repeatPasswd, err := readPassword("Repeat password: ")
+			if err != nil {
+				errExit(err)
 			}
 			if passwd != repeatPasswd {
 				errExit("password and repeat password does not match")
