@@ -1,23 +1,25 @@
-package router
+// 该模块仅负责登录、登出、保持登录。
+// 获取用户信息应当写在users模块。
+
+package login
 
 import (
 	"net/http"
 
 	"github.com/bddjr/BCSPanel/src/config"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/routertools"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/BCSPanel/src/user"
 	"github.com/gin-gonic/gin"
 )
 
-type apiLogin struct{}
-
-func (a apiLogin) Init(g *gin.RouterGroup) {
-	g.POST("/login", a.handlerLogin)
-	g.GET("/logout", a.handlerLogout)
-	g.GET("/keepsession", a.handlerKeepSession)
+func Init(g *gin.RouterGroup) {
+	g.POST("login", login)
+	g.GET("logout", logout)
+	g.GET("keepsession", keepSession)
 }
 
-func (a apiLogin) handlerLogin(ctx *gin.Context) {
+func login(ctx *gin.Context) {
 	mysession.LogOutForCtx(ctx)
 
 	type formType struct {
@@ -53,12 +55,12 @@ func (a apiLogin) handlerLogin(ctx *gin.Context) {
 	ctx.Status(200)
 }
 
-func (a apiLogin) handlerLogout(ctx *gin.Context) {
+func logout(ctx *gin.Context) {
 	mysession.LogOutForCtx(ctx)
-	redirect(ctx, 303, config.OldHttp.PathPrefix)
+	routertools.Redirect(ctx, 303, config.OldHttp.PathPrefix)
 }
 
-func (a apiLogin) handlerKeepSession(ctx *gin.Context) {
+func keepSession(ctx *gin.Context) {
 	if mysession.CheckCtx(ctx) {
 		ctx.Status(200)
 		return

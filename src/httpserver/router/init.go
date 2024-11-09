@@ -6,10 +6,14 @@ import (
 	"os"
 
 	"github.com/bddjr/BCSPanel/src/config"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/files"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/login"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/settings"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/terminals"
+	"github.com/bddjr/BCSPanel/src/httpserver/router/users"
 	"github.com/bddjr/BCSPanel/src/mylog"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/gzipstatic-gin"
-	"github.com/bddjr/hlfhr"
 	"github.com/gin-gonic/gin"
 	"github.com/nanmu42/gzip"
 )
@@ -18,25 +22,13 @@ func init() {
 	gin.SetMode(gin.ReleaseMode)
 }
 
-func handlerCheckNotLoggedIn401(ctx *gin.Context) {
-	if !mysession.CheckCtx(ctx) {
-		ctx.AbortWithStatus(401)
-	}
+func api(g *gin.RouterGroup) {
+	files.Init(g.Group("files"))
+	login.Init(g.Group("login"))
+	settings.Init(g.Group("settings"))
+	terminals.Init(g.Group("terminals"))
+	users.Init(g.Group("users"))
 }
-
-func redirect(ctx *gin.Context, code int, path string) {
-	hlfhr.Redirect(ctx.Writer, code, path)
-}
-
-func apiInit(apiGroup *gin.RouterGroup) {
-	apiFiles{}.Init(apiGroup.Group("files"))
-	apiLogin{}.Init(apiGroup.Group("login"))
-	apiSettings{}.Init(apiGroup.Group("settings"))
-	apiTerminals{}.Init(apiGroup.Group("terminals"))
-	apiUsers{}.Init(apiGroup.Group("users"))
-}
-
-// var regexpUserAgentBot = regexp.MustCompile(`[bB][oO][tT]`)
 
 func GetHandler() http.Handler {
 	// 创建新的路由
@@ -117,23 +109,23 @@ func GetHandler() http.Handler {
 	Router.StaticFile("/robots.txt", dist+"robots.txt")
 
 	// group
-	mainGroup := &Router.RouterGroup
+	main := &Router.RouterGroup
 	if config.OldHttp.PathPrefix != "/" {
-		mainGroup = mainGroup.Group(config.OldHttp.PathPrefix)
+		main = main.Group(config.OldHttp.PathPrefix)
 	}
 
 	{
-		g := mainGroup.Group("assets")
+		g := main.Group("assets")
 		g.Use(func(ctx *gin.Context) {
 			ctx.Header("Cache-Control", "max-age=86400")
 		})
 		gzipstatic.Static(g, "/", dist+"assets")
 	}
 
-	gzipstatic.StaticFile(mainGroup, "loading-failed.js", dist+"loading-failed.js")
+	gzipstatic.StaticFile(main, "loading-failed.js", dist+"loading-failed.js")
 
 	// index
-	mainGroup.GET("/", func(ctx *gin.Context) {
+	main.GET("/", func(ctx *gin.Context) {
 		ctx.Request.Header.Del("If-Modified-Since")
 		ctx.Header("Cache-Control", "no-store")
 		if mysession.CheckCtx(ctx) {
@@ -144,7 +136,7 @@ func GetHandler() http.Handler {
 	})
 
 	// api
-	apiInit(mainGroup.Group("api"))
+	api(main.Group("api"))
 
 	return Router.Handler()
 }
