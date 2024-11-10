@@ -6,7 +6,6 @@ package login
 import (
 	"net/http"
 
-	"github.com/bddjr/BCSPanel/src/config"
 	"github.com/bddjr/BCSPanel/src/httpserver/router/routertools"
 	"github.com/bddjr/BCSPanel/src/mysession"
 	"github.com/bddjr/BCSPanel/src/user"
@@ -57,7 +56,7 @@ func login(ctx *gin.Context) {
 
 func logout(ctx *gin.Context) {
 	mysession.LogOutForCtx(ctx)
-	routertools.Redirect(ctx, 303, config.OldHttp.PathPrefix)
+	routertools.Redirect(ctx, 303, "../../")
 }
 
 func keepSession(ctx *gin.Context) {

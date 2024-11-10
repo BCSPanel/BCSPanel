@@ -20,6 +20,6 @@ func Shutdown(code int) {
 
 	mylog.INFOln("Shutdown")
 
-	httpserver.CloseServerAll()
+	httpserver.Close()
 	cmdservercloser.Close()
 }
