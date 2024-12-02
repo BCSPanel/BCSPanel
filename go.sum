@@ -1,5 +1,7 @@
 github.com/bddjr/basiclogin-gin v0.0.7 h1:KGeofLYH0fZA9OGoqEhOIGy7zaI15F+V6Q8Rp3wVj68=
 github.com/bddjr/basiclogin-gin v0.0.7/go.mod h1:tVYZaA674r1fwFQ/w8chZYCkNxKFBmBLzmCvc5CEemM=
+github.com/bddjr/cryptorandstr v1.0.1 h1:lRoo5R2wILkhplm9Ryh1roq+CKN35FuZoraavG+zWY4=
+github.com/bddjr/cryptorandstr v1.0.1/go.mod h1:QzSh4h+p6Isgl1RP6Sgr+tvYj0NvsLGAj7X+U0NxO98=
 github.com/bddjr/gzipstatic-gin v0.0.2 h1:x6IRFebTEPl6TH2LGVXb6Q5LC+R1sP56J7EzaYPLbeM=
 github.com/bddjr/gzipstatic-gin v0.0.2/go.mod h1:ppaUIiiSjESElzUaeXqxJt6WYUeTGKJdDvrco8Df75Y=
 github.com/bddjr/gzipstatic-gin v0.0.3 h1:m7olF14tKh28C83rT6KLgmDIp/pxKzbGzf6wv/LSW1s=
@@ -28,6 +30,8 @@ github.com/bddjr/hlfhr v1.2.3 h1:SIcIodCE60cGeP8We1HMb3Kd8ic9XC/tlC233MZkZFs=
 github.com/bddjr/hlfhr v1.2.3/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/bddjr/hlfhr v1.2.4 h1:1KZcqvzeWJdB20REsfKuCsdnRAeVC113cONlhswypek=
 github.com/bddjr/hlfhr v1.2.4/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
+github.com/bddjr/hlfhr v1.2.5 h1:jnNqJAhD7pczl0MtgtwssbHxoTUTHCUsOn1VXIa7M5o=
+github.com/bddjr/hlfhr v1.2.5/go.mod h1:oyIv4Q9JpCgZFdtH3KyTNWp7YYRWl4zl8k4ozrMAB4g=
 github.com/bddjr/nametocert-go v0.1.0 h1:dvrJgrtu2Mt0rPQurWHNji5etZPPjHyoihgys1a6T6g=
 github.com/bddjr/nametocert-go v0.1.0/go.mod h1:XtQUvcJy3r2wKMkCAbLpBmGOnwYFJMAD854fs76M+ME=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=

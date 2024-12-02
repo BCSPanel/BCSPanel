@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/bddjr/BCSPanel/src/config"
-	"github.com/bddjr/BCSPanel/src/myrand"
+	"github.com/bddjr/cryptorandstr"
 )
 
 func Create(username string, secure bool) (cookie *http.Cookie, err error) {
@@ -16,7 +16,7 @@ func Create(username string, secure bool) (cookie *http.Cookie, err error) {
 	var idStr string
 	var id id
 	for i := 0; ; i++ {
-		idStr = myrand.RandStr64(SessionIdLength)
+		idStr = cryptorandstr.MustRand64(SessionIdLength)
 		id = toId(idStr)
 		if _, ok := sessions[id]; !ok {
 			break
@@ -26,7 +26,7 @@ func Create(username string, secure bool) (cookie *http.Cookie, err error) {
 		}
 	}
 
-	passwdStr := myrand.RandStr64(SessionPasswordLength)
+	passwdStr := cryptorandstr.MustRand64(SessionPasswordLength)
 	t := time.Now()
 
 	sessions[id] = &Session{
