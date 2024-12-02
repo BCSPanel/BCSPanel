@@ -16,7 +16,10 @@ func Create(username string, secure bool) (cookie *http.Cookie, err error) {
 	var idStr string
 	var id id
 	for i := 0; ; i++ {
-		idStr = cryptorandstr.MustRand64(SessionIdLength)
+		idStr, err = cryptorandstr.Rand64(SessionIdLength)
+		if err != nil {
+			return nil, err
+		}
 		id = toId(idStr)
 		if _, ok := sessions[id]; !ok {
 			break
@@ -26,7 +29,10 @@ func Create(username string, secure bool) (cookie *http.Cookie, err error) {
 		}
 	}
 
-	passwdStr := cryptorandstr.MustRand64(SessionPasswordLength)
+	passwdStr, err := cryptorandstr.Rand64(SessionPasswordLength)
+	if err != nil {
+		return nil, err
+	}
 	t := time.Now()
 
 	sessions[id] = &Session{
